@@ -170,10 +170,95 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             font-size: 0.85rem;
         }
         
-        /* Quick Links */
+        /* Dashboard Blocks - Full Width */
+        .dashboard-blocks {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+        
+        .dashboard-block {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-decoration: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+        }
+        
+        .dashboard-block.spab::before { background: linear-gradient(90deg, var(--primary), #0a5cad); }
+        .dashboard-block.destana::before { background: linear-gradient(90deg, var(--secondary), #ff6b3d); }
+        
+        .dashboard-block:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .dashboard-block .block-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-block.spab .block-icon { background: linear-gradient(135deg, var(--primary) 0%, #032d5e 100%); }
+        .dashboard-block.destana .block-icon { background: linear-gradient(135deg, var(--secondary) 0%, #c43e15 100%); }
+        
+        .dashboard-block h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .dashboard-block p {
+            color: #666;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+        
+        .dashboard-block .block-arrow {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: #ddd;
+            transition: all 0.3s;
+        }
+        
+        .dashboard-block:hover .block-arrow {
+            right: 20px;
+            color: var(--secondary);
+        }
+        
+        /* Admin Quick Links */
         .quick-links {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 35px;
         }
@@ -284,14 +369,24 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         @media (max-width: 992px) {
             .stats-grid { grid-template-columns: 1fr; }
             .breakdown-grid { grid-template-columns: 1fr; }
-            .quick-links { grid-template-columns: repeat(2, 1fr); }
+            .dashboard-blocks { grid-template-columns: 1fr; }
+            .quick-links { grid-template-columns: 1fr; }
         }
         
         @media (max-width: 576px) {
-            .welcome-section h1 { font-size: 1.8rem; }
-            .quick-links { grid-template-columns: 1fr; }
-            .nav-header { flex-direction: column; gap: 15px; }
-            .nav-header .nav-links a { margin: 5px; }
+            body { padding: 10px; }
+            .welcome-section h1 { font-size: 1.6rem; }
+            .welcome-section { padding: 15px; margin-bottom: 25px; }
+            .nav-header { flex-direction: column; gap: 15px; padding: 15px; }
+            .nav-header .nav-links { display: flex; flex-wrap: wrap; justify-content: center; }
+            .nav-header .nav-links a { margin: 5px; font-size: 0.85rem; }
+            .stat-card { padding: 20px; }
+            .stat-card .icon { width: 60px; height: 60px; font-size: 1.5rem; }
+            .stat-card .info h3 { font-size: 2rem; }
+            .dashboard-block { padding: 30px 20px; min-height: 160px; }
+            .dashboard-block .block-icon { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dashboard-block h3 { font-size: 1.2rem; }
+            .dashboard-block .block-arrow { display: none; }
         }
     </style>
 </head>
@@ -337,27 +432,35 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             </div>
         </div>
         
-        <!-- Quick Links -->
+        <!-- Dashboard Blocks - Full Width -->
+        <div class="dashboard-blocks">
+            <a href="pages/spab.php" class="dashboard-block spab">
+                <div class="block-icon"><i class="fas fa-school"></i></div>
+                <h3>Dashboard SPAB</h3>
+                <p>Lihat data Sekolah/Madrasah Aman Bencana</p>
+                <i class="fas fa-arrow-right block-arrow"></i>
+            </a>
+            <a href="pages/destana.php" class="dashboard-block destana">
+                <div class="block-icon"><i class="fas fa-house-user"></i></div>
+                <h3>Dashboard DESTANA</h3>
+                <p>Lihat data Desa/Kelurahan Tangguh Bencana</p>
+                <i class="fas fa-arrow-right block-arrow"></i>
+            </a>
+        </div>
+        
+        <!-- Admin Quick Links -->
+        <?php if ($user_role == 'admin'): ?>
         <div class="quick-links">
-            <a href="pages/spab.php" class="quick-link">
-                <i class="fas fa-chart-bar"></i>
-                <span>Dashboard SPAB</span>
-            </a>
-            <a href="pages/destana.php" class="quick-link">
-                <i class="fas fa-chart-pie"></i>
-                <span>Dashboard DESTANA</span>
-            </a>
-            <?php if ($user_role == 'admin'): ?>
             <a href="admin/spab.php" class="quick-link">
-                <i class="fas fa-edit"></i>
-                <span>Kelola SPAB</span>
+                <i class="fas fa-edit" style="font-size: 2rem; margin-bottom: 12px; display: block; color: var(--secondary);"></i>
+                <span style="font-weight: 600; font-size: 0.95rem;">Kelola SPAB</span>
             </a>
             <a href="admin/destana.php" class="quick-link">
-                <i class="fas fa-cog"></i>
-                <span>Kelola DESTANA</span>
+                <i class="fas fa-cog" style="font-size: 2rem; margin-bottom: 12px; display: block; color: var(--secondary);"></i>
+                <span style="font-weight: 600; font-size: 0.95rem;">Kelola DESTANA</span>
             </a>
-            <?php endif; ?>
         </div>
+        <?php endif; ?>
         
         <!-- Breakdown Cards -->
         <div class="breakdown-grid">

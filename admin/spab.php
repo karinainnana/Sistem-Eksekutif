@@ -63,7 +63,8 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         .sidebar-menu a { display: flex; align-items: center; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none; transition: all 0.3s; border-left: 3px solid transparent; }
         .sidebar-menu a:hover { background: rgba(255,255,255,0.1); color: white; }
         .sidebar-menu a.active { background: rgba(255,255,255,0.15); color: white; border-left-color: var(--secondary); }
-        .sidebar-menu a i { width: 20px; margin-right: 12px; text-align: center; }
+        .sidebar-menu a i { width: 20px; min-width: 20px; margin-right: 10px; text-align: center; font-size: 0.95rem; }
+        .sidebar-menu a span { flex: 1; }
         
         .main-content { margin-left: var(--sidebar-width); min-height: 100vh; }
         .topbar { background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -92,6 +93,34 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
         .table thead { background: #f8f9fa; }
         .table th { font-weight: 600; color: var(--primary); }
+        
+        /* Mobile Toggle */
+        .mobile-toggle { display: none; background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .sidebar-overlay.show { display: block; }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); width: 260px; transition: transform 0.3s; }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: block; }
+            .topbar { padding: 12px 15px; flex-wrap: wrap; gap: 10px; }
+            .topbar h1 { font-size: 1.1rem; }
+        }
+        
+        @media (max-width: 768px) {
+            .content-wrapper { padding: 15px; }
+            .card-header { flex-direction: column; gap: 10px; align-items: flex-start !important; }
+            .table-responsive { font-size: 0.85rem; }
+            .btn-group { display: flex; flex-direction: column; gap: 5px; }
+            .btn-group .btn { width: 100%; }
+        }
+        
+        @media (max-width: 576px) {
+            .topbar { flex-direction: column; align-items: flex-start; }
+            .user-info { width: 100%; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        }
     </style>
 </head>
 <body>
@@ -103,14 +132,14 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         </div>
         <div class="sidebar-menu">
             <div class="menu-label">Menu Utama</div>
-            <a href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="users.php"><i class="fas fa-users-cog"></i> Kelola Pengguna</a>
+            <a href="index.php"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+            <a href="users.php"><i class="fas fa-users-cog"></i><span>Kelola Pengguna</span></a>
             
             <div class="menu-label">Data Master</div>
-            <a href="spab.php" class="active"><i class="fas fa-school"></i> Kelola SPAB</a>
-            <a href="destana.php"><i class="fas fa-house-user"></i> Kelola DESTANA</a>
+            <a href="spab.php" class="active"><i class="fas fa-school"></i><span>Kelola SPAB</span></a>
+            <a href="destana.php"><i class="fas fa-house-user"></i><span>Kelola DESTANA</span></a>
             
-            <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
         </div>
     </div>
     
@@ -125,7 +154,10 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <!-- Main Content -->
     <div class="main-content">
         <div class="topbar">
-            <h1><i class="fas fa-school me-2"></i>Kelola Data SPAB</h1>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <h1><i class="fas fa-school me-2"></i>Kelola Data SPAB</h1>
+            </div>
             <div class="user-info">
                 <span><?php echo htmlspecialchars($user_email); ?></span>
                 <span class="badge">Admin</span>
@@ -324,6 +356,15 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             const dt = document.getElementById('datatablesSimple');
             if (dt) new simpleDatatables.DataTable(dt, { perPage: 25, labels: { placeholder: "Cari...", perPage: "{select} per halaman", noRows: "Tidak ada data", info: "{start}-{end} dari {rows}" } });
         });
+    </script>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('show');
+        document.querySelector('.sidebar-overlay').classList.toggle('show');
+    }
     </script>
 </body>
 </html>

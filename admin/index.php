@@ -122,14 +122,21 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         
         .sidebar-menu a i {
             width: 20px;
-            margin-right: 12px;
+            min-width: 20px;
+            margin-right: 10px;
             text-align: center;
+            font-size: 0.95rem;
+        }
+        
+        .sidebar-menu a span {
+            flex: 1;
         }
         
         /* Main Content */
         .main-content {
             margin-left: var(--sidebar-width);
             min-height: 100vh;
+            transition: margin-left 0.3s;
         }
         
         .topbar {
@@ -139,6 +146,8 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .topbar h1 {
@@ -151,7 +160,8 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         .user-info .badge {
@@ -159,13 +169,13 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         }
         
         .content-wrapper {
-            padding: 25px;
+            padding: 20px;
         }
         
         /* Stats Cards */
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 25px;
         }
@@ -186,14 +196,15 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         }
         
         .stat-card .icon {
-            width: 60px;
-            height: 60px;
+            width: 55px;
+            height: 55px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: white;
+            flex-shrink: 0;
         }
         
         .stat-card .icon.primary { background: var(--primary); }
@@ -202,7 +213,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         .stat-card .icon.warning { background: #f59e0b; }
         
         .stat-card .info h3 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: #333;
             margin: 0;
@@ -211,7 +222,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         .stat-card .info p {
             margin: 0;
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         /* Cards */
@@ -271,6 +282,121 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         }
         .info-list li:last-child { border-bottom: none; }
         .info-list li strong { color: var(--primary); }
+        
+        /* Mobile Toggle Button */
+        .mobile-toggle {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 992px) {
+            :root { --sidebar-width: 0px; }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .topbar {
+                padding: 12px 15px;
+            }
+            
+            .topbar h1 {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
+            .content-wrapper { padding: 15px; }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-card .icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+            
+            .stat-card .info h3 {
+                font-size: 1.3rem;
+            }
+            
+            .stat-card .info p {
+                font-size: 0.8rem;
+            }
+            
+            .row { margin: 0 -10px; }
+            .row > div { padding: 0 10px; margin-bottom: 15px; }
+        }
+        
+        @media (max-width: 576px) {
+            .quick-actions { grid-template-columns: 1fr; }
+            
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px solid #eee;
+            }
+            
+            .action-btn {
+                padding: 15px;
+            }
+            
+            .action-btn i {
+                font-size: 1.4rem;
+                margin-bottom: 8px;
+            }
+        }
+        
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -282,14 +408,14 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         </div>
         <div class="sidebar-menu">
             <div class="menu-label">Menu Utama</div>
-            <a href="index.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="users.php"><i class="fas fa-users-cog"></i> Kelola Pengguna</a>
+            <a href="index.php" class="active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+            <a href="users.php"><i class="fas fa-users-cog"></i><span>Kelola Pengguna</span></a>
             
             <div class="menu-label">Data Master</div>
-            <a href="spab.php"><i class="fas fa-school"></i> Kelola SPAB</a>
-            <a href="destana.php"><i class="fas fa-house-user"></i> Kelola DESTANA</a>
+            <a href="spab.php"><i class="fas fa-school"></i><span>Kelola SPAB</span></a>
+            <a href="destana.php"><i class="fas fa-house-user"></i><span>Kelola DESTANA</span></a>
             
-            <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
         </div>
     </div>
     
@@ -304,7 +430,10 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <!-- Main Content -->
     <div class="main-content">
         <div class="topbar">
-            <h1><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</h1>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <h1><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</h1>
+            </div>
             <div class="user-info">
                 <span><?php echo htmlspecialchars($user_email); ?></span>
                 <span class="badge">Admin</span>
@@ -362,6 +491,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                         <a href="destana.php" class="action-btn">
                             <i class="fas fa-plus-circle"></i>
                             <span>Kelola DESTANA</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -404,5 +534,15 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    
+    <script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('show');
+        document.querySelector('.sidebar-overlay').classList.toggle('show');
+    }
+    </script>
 </body>
 </html>
