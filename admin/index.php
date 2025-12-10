@@ -1,10 +1,11 @@
 <?php
 /**
- * Admin Dashboard
- * Halaman dashboard untuk admin
+ * Admin Dashboard dengan Sidebar
+ * Tema: Biru #043e80, Orange #e64a19
  */
 
 $page_title = 'Admin Dashboard';
+$active_menu = 'dashboard';
 require_once dirname(__DIR__) . '/config/config.php';
 require_once dirname(__DIR__) . '/includes/spab_functions.php';
 require_once dirname(__DIR__) . '/includes/destana_functions.php';
@@ -29,324 +30,379 @@ $result = mysqli_query($conn, "SELECT COUNT(*) as total FROM pengguna WHERE role
 $row = mysqli_fetch_assoc($result);
 $total_admins = (int)$row['total'];
 
+// Get eksekutif count
+$total_eksekutif = $total_users - $total_admins;
+
 $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=0" />
-    <meta name="description" content="Admin Dashboard - Sistem Informasi Eksekutif BPBD DIY" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $page_title; ?> - BPBD PKRR DIY</title>
     
-    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
+        :root {
+            --primary: #043e80;
+            --secondary: #e64a19;
+            --sidebar-width: 260px;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f4f6f9; }
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1a1c2c 0%, #2d3748 100%);
-            min-height: 100vh;
-            padding: 15px;
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--primary);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
         }
         
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         
-        .nav-header {
+        .sidebar-header h4 {
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-header small {
+            opacity: 0.7;
+            font-size: 0.8rem;
+        }
+        
+        .sidebar-menu {
+            padding: 15px 0;
+        }
+        
+        .menu-label {
+            padding: 10px 20px 5px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
             background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-left-color: var(--secondary);
+        }
+        
+        .sidebar-menu a i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        .topbar {
+            background: white;
+            padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        .nav-header .brand { font-size: 1.2rem; font-weight: 700; }
-        
-        .nav-header .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-            transition: opacity 0.3s;
+        .topbar h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
         }
         
-        .nav-header .nav-links a:hover,
-        .nav-header .nav-links a.active { opacity: 1; }
-        
-        .page-title {
-            color: white;
-            margin-bottom: 25px;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         
-        .page-title h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
+        .user-info .badge {
+            background: var(--secondary);
         }
         
-        .page-title p { opacity: 0.8; }
+        .content-wrapper {
+            padding: 25px;
+        }
         
-        .stats-grid {
+        /* Stats Cards */
+        .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             margin-bottom: 25px;
         }
         
         .stat-card {
-            background: linear-gradient(135deg, var(--card-color) 0%, var(--card-color-dark) 100%);
-            border-radius: 16px;
-            padding: 25px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-decoration: none;
-            display: block;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s;
         }
         
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            transform: translateY(-3px);
+        }
+        
+        .stat-card .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
             color: white;
         }
         
-        .stat-card.primary { --card-color: #3b82f6; --card-color-dark: #2563eb; }
-        .stat-card.success { --card-color: #10b981; --card-color-dark: #059669; }
-        .stat-card.warning { --card-color: #f59e0b; --card-color-dark: #d97706; }
-        .stat-card.danger { --card-color: #ef4444; --card-color-dark: #dc2626; }
+        .stat-card .icon.primary { background: var(--primary); }
+        .stat-card .icon.secondary { background: var(--secondary); }
+        .stat-card .icon.success { background: #10b981; }
+        .stat-card .icon.warning { background: #f59e0b; }
         
-        .stat-card .stat-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 4rem;
-            opacity: 0.2;
+        .stat-card .info h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
         }
         
-        .stat-card .stat-content { position: relative; z-index: 1; }
-        .stat-card .stat-label { font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px; }
-        .stat-card .stat-number { font-size: 2.5rem; font-weight: 700; line-height: 1; }
-        .stat-card .stat-action { margin-top: 15px; font-size: 0.85rem; opacity: 0.9; }
+        .stat-card .info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
         
-        .content-card {
+        /* Cards */
+        .card {
             background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: none;
             margin-bottom: 25px;
         }
         
-        .content-header {
-            background: linear-gradient(135deg, #1a1c2c 0%, #2d3748 100%);
+        .card-header {
+            background: var(--primary);
             color: white;
-            padding: 20px;
+            padding: 15px 20px;
             font-weight: 600;
+            border-radius: 12px 12px 0 0 !important;
+            border: none;
         }
         
-        .content-header i { margin-right: 10px; }
+        .card-body { padding: 20px; }
         
-        .content-body { padding: 25px; }
-        
+        /* Quick Actions */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
         }
         
         .action-btn {
             background: #f8f9fa;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 25px 20px;
+            border-radius: 10px;
+            padding: 20px;
             text-align: center;
-            color: #1a1c2c;
+            color: var(--primary);
             text-decoration: none;
             transition: all 0.3s;
         }
         
         .action-btn:hover {
-            border-color: #3b82f6;
-            background: #f0f7ff;
-            transform: translateY(-3px);
-            color: #3b82f6;
+            border-color: var(--secondary);
+            background: #fff5f2;
+            color: var(--secondary);
         }
         
-        .action-btn i { font-size: 2rem; margin-bottom: 10px; display: block; }
-        .action-btn span { font-weight: 500; }
+        .action-btn i { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+        .action-btn span { font-weight: 500; font-size: 0.9rem; }
         
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .info-card h5 {
-            font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        .info-item {
+        /* Info List */
+        .info-list { list-style: none; padding: 0; margin: 0; }
+        .info-list li {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #f1f1f1;
         }
-        
-        .info-item:last-child { border-bottom: none; }
-        
-        .badge-role {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        
-        .badge-admin { background: #fee2e2; color: #dc2626; }
-        .badge-eksekutif { background: #dbeafe; color: #2563eb; }
+        .info-list li:last-child { border-bottom: none; }
+        .info-list li strong { color: var(--primary); }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Navigation Header -->
-        <div class="nav-header">
-            <div class="brand">
-                <i class="fas fa-user-shield me-2"></i>Admin Panel
-            </div>
-            <div class="nav-links">
-                <a href="../index.php">Dashboard</a>
-                <a href="../pages/spab.php">SPAB</a>
-                <a href="../pages/destana.php">DESTANA</a>
-                <a href="index.php" class="active">Admin</a>
-                <a href="users.php">Pengguna</a>
-                <a href="../auth/logout.php"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
-            </div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="fas fa-shield-alt me-2"></i>BPBD PKRR DIY</h4>
+            <small>Admin Panel</small>
         </div>
-        
-        <!-- Page Title -->
-        <div class="page-title">
-            <h1><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h1>
-            <p>Selamat datang, <?php echo htmlspecialchars($user_email); ?></p>
-        </div>
-        
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <a href="../pages/tabel-spab.php" class="stat-card primary">
-                <i class="fas fa-school stat-icon"></i>
-                <div class="stat-content">
-                    <div class="stat-label">Total SPAB</div>
-                    <div class="stat-number"><?php echo number_format($total_spab); ?></div>
-                    <div class="stat-action"><i class="fas fa-arrow-right me-1"></i>Kelola Data</div>
-                </div>
-            </a>
+        <div class="sidebar-menu">
+            <div class="menu-label">Menu Utama</div>
+            <a href="index.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="users.php"><i class="fas fa-users-cog"></i> Kelola Pengguna</a>
             
-            <a href="../pages/tabel-destana.php" class="stat-card success">
-                <i class="fas fa-users stat-icon"></i>
-                <div class="stat-content">
-                    <div class="stat-label">Total DESTANA</div>
-                    <div class="stat-number"><?php echo number_format($total_destana); ?></div>
-                    <div class="stat-action"><i class="fas fa-arrow-right me-1"></i>Kelola Data</div>
-                </div>
-            </a>
+            <div class="menu-label">Data Master</div>
+            <a href="spab.php"><i class="fas fa-school"></i> Kelola SPAB</a>
+            <a href="destana.php"><i class="fas fa-house-user"></i> Kelola DESTANA</a>
             
-            <a href="users.php" class="stat-card warning">
-                <i class="fas fa-user-friends stat-icon"></i>
-                <div class="stat-content">
-                    <div class="stat-label">Total Pengguna</div>
-                    <div class="stat-number"><?php echo number_format($total_users); ?></div>
-                    <div class="stat-action"><i class="fas fa-arrow-right me-1"></i>Kelola Pengguna</div>
-                </div>
-            </a>
-            
-            <a href="users.php" class="stat-card danger">
-                <i class="fas fa-user-shield stat-icon"></i>
-                <div class="stat-content">
-                    <div class="stat-label">Total Admin</div>
-                    <div class="stat-number"><?php echo number_format($total_admins); ?></div>
-                    <div class="stat-action"><i class="fas fa-arrow-right me-1"></i>Kelola Admin</div>
-                </div>
-            </a>
+            <div class="menu-label">Lainnya</div>
+            <a href="../index.php"><i class="fas fa-desktop"></i> Lihat Eksekutif</a>
+            <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
-        
-        <!-- Quick Actions -->
-        <div class="content-card">
-            <div class="content-header">
-                <i class="fas fa-bolt"></i>Quick Actions
-            </div>
-            <div class="content-body">
-                <div class="quick-actions">
-                    <a href="../pages/tabel-spab.php" class="action-btn">
-                        <i class="fas fa-plus-circle text-primary"></i>
-                        <span>Tambah SPAB</span>
-                    </a>
-                    <a href="../pages/tabel-destana.php" class="action-btn">
-                        <i class="fas fa-plus-circle text-success"></i>
-                        <span>Tambah DESTANA</span>
-                    </a>
-                    <a href="users.php" class="action-btn">
-                        <i class="fas fa-user-plus text-warning"></i>
-                        <span>Tambah Pengguna</span>
-                    </a>
-                    <a href="../index.php" class="action-btn">
-                        <i class="fas fa-chart-line text-info"></i>
-                        <span>Dashboard Eksekutif</span>
-                    </a>
-                </div>
+    </div>
+    
+    <script>
+    function confirmLogout() {
+        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+            window.location.href = '../auth/logout.php';
+        }
+    }
+    </script>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <h1><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</h1>
+            <div class="user-info">
+                <span><?php echo htmlspecialchars($user_email); ?></span>
+                <span class="badge">Admin</span>
             </div>
         </div>
         
-        <!-- Info Section -->
-        <div class="content-card">
-            <div class="content-header">
-                <i class="fas fa-info-circle"></i>Informasi Sistem
+        <div class="content-wrapper">
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="icon primary"><i class="fas fa-school"></i></div>
+                    <div class="info">
+                        <h3><?php echo number_format($total_spab); ?></h3>
+                        <p>Total SPAB</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon secondary"><i class="fas fa-house-user"></i></div>
+                    <div class="info">
+                        <h3><?php echo number_format($total_destana); ?></h3>
+                        <p>Total DESTANA</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon success"><i class="fas fa-users"></i></div>
+                    <div class="info">
+                        <h3><?php echo number_format($total_users); ?></h3>
+                        <p>Total Pengguna</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon warning"><i class="fas fa-user-shield"></i></div>
+                    <div class="info">
+                        <h3><?php echo number_format($total_admins); ?></h3>
+                        <p>Total Admin</p>
+                    </div>
+                </div>
             </div>
-            <div class="content-body">
-                <div class="info-grid">
-                    <div class="info-card">
-                        <h5><i class="fas fa-chart-bar me-2"></i>Statistik Data</h5>
-                        <div class="info-item">
-                            <span>Total SPAB</span>
-                            <strong><?php echo number_format($total_spab); ?></strong>
+            
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="users.php" class="action-btn">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Tambah Pengguna</span>
+                        </a>
+                        <a href="spab.php" class="action-btn">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Kelola SPAB</span>
+                        </a>
+                        <a href="destana.php" class="action-btn">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Kelola DESTANA</span>
+                        </a>
+                        <a href="../index.php" class="action-btn">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Lihat Eksekutif</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Info Section -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-bar me-2"></i>Statistik Data
                         </div>
-                        <div class="info-item">
-                            <span>Total DESTANA</span>
-                            <strong><?php echo number_format($total_destana); ?></strong>
-                        </div>
-                        <div class="info-item">
-                            <span>Total Pengguna</span>
-                            <strong><?php echo number_format($total_users); ?></strong>
+                        <div class="card-body">
+                            <ul class="info-list">
+                                <li><span>Total SPAB</span><strong><?php echo number_format($total_spab); ?></strong></li>
+                                <li><span>Total DESTANA</span><strong><?php echo number_format($total_destana); ?></strong></li>
+                                <li><span>Total Pengguna</span><strong><?php echo number_format($total_users); ?></strong></li>
+                                <li><span>Admin</span><strong><?php echo number_format($total_admins); ?></strong></li>
+                                <li><span>Eksekutif</span><strong><?php echo number_format($total_eksekutif); ?></strong></li>
+                            </ul>
                         </div>
                     </div>
-                    
-                    <div class="info-card">
-                        <h5><i class="fas fa-user me-2"></i>Informasi Login</h5>
-                        <div class="info-item">
-                            <span>Email</span>
-                            <strong><?php echo htmlspecialchars($_SESSION['email']); ?></strong>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-user me-2"></i>Informasi Login
                         </div>
-                        <div class="info-item">
-                            <span>Role</span>
-                            <span class="badge-role badge-admin"><?php echo ucfirst($_SESSION['role']); ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span>Waktu Server</span>
-                            <strong><?php echo date('d M Y H:i'); ?></strong>
+                        <div class="card-body">
+                            <ul class="info-list">
+                                <li><span>Email</span><strong><?php echo htmlspecialchars($_SESSION['email']); ?></strong></li>
+                                <li><span>Role</span><strong style="color: var(--secondary);"><?php echo ucfirst($_SESSION['role']); ?></strong></li>
+                                <li><span>Waktu Server</span><strong><?php echo date('d M Y H:i'); ?></strong></li>
+                                <li><span>Versi Sistem</span><strong>2.0.0</strong></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -354,7 +410,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

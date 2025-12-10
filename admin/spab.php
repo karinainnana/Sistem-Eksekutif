@@ -1,12 +1,12 @@
 <?php
 /**
- * Admin - Kelola Pengguna dengan Sidebar
+ * Admin - Kelola SPAB dengan Sidebar
  * Tema: Biru #043e80, Orange #e64a19
  */
 
-$page_title = 'Kelola Pengguna';
-$active_menu = 'users';
+$page_title = 'Kelola SPAB';
 require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/spab_functions.php';
 
 // Check admin role
 if (!isset($_SESSION['log']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
@@ -16,49 +16,25 @@ if (!isset($_SESSION['log']) || !isset($_SESSION['role']) || $_SESSION['role'] !
 
 // Process form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['adduser'])) {
-        $email = mysqli_real_escape_string($conn, $_POST['email']);
-        $password = mysqli_real_escape_string($conn, $_POST['password']);
-        $role = mysqli_real_escape_string($conn, $_POST['role']);
-        
-        $check = mysqli_query($conn, "SELECT * FROM pengguna WHERE email = '$email'");
-        if (mysqli_num_rows($check) > 0) {
-            header('Location: users.php?error=email_exists');
-            exit;
-        }
-        
-        mysqli_query($conn, "INSERT INTO pengguna (email, password, role) VALUES ('$email', '$password', '$role')");
-        header('Location: users.php?success=tambah');
+    if (isset($_POST['addnewspab'])) {
+        addSPAB($_POST);
+        header('Location: spab.php?success=tambah');
         exit;
     }
-    
-    if (isset($_POST['updateuser'])) {
-        $id = (int)$_POST['id_pengguna'];
-        $email = mysqli_real_escape_string($conn, $_POST['email']);
-        $role = mysqli_real_escape_string($conn, $_POST['role']);
-        
-        $query = "UPDATE pengguna SET email='$email', role='$role'";
-        if (!empty($_POST['password'])) {
-            $password = mysqli_real_escape_string($conn, $_POST['password']);
-            $query .= ", password='$password'";
-        }
-        $query .= " WHERE id_pengguna=$id";
-        mysqli_query($conn, $query);
-        header('Location: users.php?success=update');
+    if (isset($_POST['updatespab'])) {
+        updateSPAB($_POST['id_spab'], $_POST);
+        header('Location: spab.php?success=update');
         exit;
     }
-    
-    if (isset($_POST['deleteuser'])) {
-        $id = (int)$_POST['id_pengguna'];
-        mysqli_query($conn, "DELETE FROM pengguna WHERE id_pengguna=$id");
-        header('Location: users.php?success=hapus');
+    if (isset($_POST['hapusspab'])) {
+        deleteSPAB($_POST['id_spab']);
+        header('Location: spab.php?success=hapus');
         exit;
     }
 }
 
-$allUsers = mysqli_query($conn, "SELECT * FROM pengguna ORDER BY id_pengguna ASC");
-$total_users = mysqli_num_rows($allUsers);
-$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+$allSpab = getAllSPAB([], 'DESC');
+$total_spab = countTotalSPAB();
 $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 ?>
 <!DOCTYPE html>
@@ -100,18 +76,20 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         .card-header { background: var(--primary); color: white; padding: 15px 20px; font-weight: 600; border-radius: 12px 12px 0 0 !important; border: none; display: flex; justify-content: space-between; align-items: center; }
         .card-body { padding: 20px; }
         
-        .btn-add { background: var(--secondary); color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.3s; }
+        .btn-add { background: var(--secondary); color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 500; cursor: pointer; }
         .btn-add:hover { background: #c43e15; color: white; }
         
-        .badge-role { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
-        .badge-admin { background: #fee2e2; color: #dc2626; }
-        .badge-eksekutif { background: #dbeafe; color: #2563eb; }
+        .badge-tingkatan { padding: 5px 10px; border-radius: 15px; font-size: 0.75rem; font-weight: 500; }
+        .badge-tk { background: #d1fae5; color: #065f46; }
+        .badge-sd { background: #dbeafe; color: #1e40af; }
+        .badge-smp { background: #fef3c7; color: #92400e; }
+        .badge-sma { background: #fce7f3; color: #9d174d; }
+        .badge-slb { background: #e5e7eb; color: #374151; }
         
         .btn-group .btn { padding: 5px 10px; }
         .modal-header.bg-primary { background: var(--primary) !important; }
         .modal-header.bg-danger { background: var(--secondary) !important; }
         .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
-        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(4, 62, 128, 0.2); }
         .table thead { background: #f8f9fa; }
         .table th { font-weight: 600; color: var(--primary); }
     </style>
@@ -126,10 +104,10 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         <div class="sidebar-menu">
             <div class="menu-label">Menu Utama</div>
             <a href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="users.php" class="active"><i class="fas fa-users-cog"></i> Kelola Pengguna</a>
+            <a href="users.php"><i class="fas fa-users-cog"></i> Kelola Pengguna</a>
             
             <div class="menu-label">Data Master</div>
-            <a href="spab.php"><i class="fas fa-school"></i> Kelola SPAB</a>
+            <a href="spab.php" class="active"><i class="fas fa-school"></i> Kelola SPAB</a>
             <a href="destana.php"><i class="fas fa-house-user"></i> Kelola DESTANA</a>
             
             <div class="menu-label">Lainnya</div>
@@ -149,7 +127,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <!-- Main Content -->
     <div class="main-content">
         <div class="topbar">
-            <h1><i class="fas fa-users-cog me-2"></i>Kelola Pengguna</h1>
+            <h1><i class="fas fa-school me-2"></i>Kelola Data SPAB</h1>
             <div class="user-info">
                 <span><?php echo htmlspecialchars($user_email); ?></span>
                 <span class="badge">Admin</span>
@@ -162,27 +140,20 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 <i class="fas fa-check-circle me-2"></i>
                 <?php 
                 switch ($_GET['success']) {
-                    case 'tambah': echo 'Pengguna berhasil ditambahkan!'; break;
-                    case 'update': echo 'Pengguna berhasil diperbarui!'; break;
-                    case 'hapus': echo 'Pengguna berhasil dihapus!'; break;
+                    case 'tambah': echo 'Data SPAB berhasil ditambahkan!'; break;
+                    case 'update': echo 'Data SPAB berhasil diperbarui!'; break;
+                    case 'hapus': echo 'Data SPAB berhasil dihapus!'; break;
                 }
                 ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             <?php endif; ?>
             
-            <?php if (isset($_GET['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i>Email sudah terdaftar!
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <?php endif; ?>
-            
             <div class="card">
                 <div class="card-header">
-                    <span><i class="fas fa-users me-2"></i>Daftar Pengguna (<?php echo $total_users; ?>)</span>
+                    <span><i class="fas fa-table me-2"></i>Data SPAB (<?php echo number_format($total_spab); ?>)</span>
                     <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addModal">
-                        <i class="fas fa-user-plus me-1"></i> Tambah
+                        <i class="fas fa-plus me-1"></i> Tambah Data
                     </button>
                 </div>
                 <div class="card-body">
@@ -190,57 +161,74 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Email</th>
-                                <th>Role</th>
+                                <th>Nama Sekolah</th>
+                                <th>Kabupaten</th>
+                                <th>Tahun</th>
+                                <th>Pendanaan</th>
+                                <th>Tingkatan</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no = 1; while ($user = mysqli_fetch_assoc($allUsers)): ?>
+                            <?php $no = 1; while ($data = mysqli_fetch_assoc($allSpab)): ?>
                             <tr>
                                 <td><?php echo $no++; ?></td>
-                                <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                <td><span class="badge-role badge-<?php echo $user['role']; ?>"><?php echo ucfirst($user['role']); ?></span></td>
+                                <td><?php echo htmlspecialchars($data['nama_sekolah']); ?></td>
+                                <td><?php echo htmlspecialchars($data['kabupaten']); ?></td>
+                                <td><?php echo htmlspecialchars($data['tahun']); ?></td>
+                                <td><?php echo htmlspecialchars($data['sumber_pendanaan']); ?></td>
+                                <td><span class="badge-tingkatan badge-<?php echo strtolower($data['tingkatan']); ?>"><?php echo $data['tingkatan']; ?></span></td>
                                 <td>
                                     <div class="btn-group">
-                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $user['id_pengguna']; ?>"><i class="fas fa-edit"></i></button>
-                                        <?php if ($user['id_pengguna'] != $user_id): ?>
-                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $user['id_pengguna']; ?>"><i class="fas fa-trash"></i></button>
-                                        <?php endif; ?>
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $data['id_spab']; ?>"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $data['id_spab']; ?>"><i class="fas fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
                             
                             <!-- Edit Modal -->
-                            <div class="modal fade" id="editModal<?php echo $user['id_pengguna']; ?>" tabindex="-1">
+                            <div class="modal fade" id="editModal<?php echo $data['id_spab']; ?>" tabindex="-1">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <form method="post">
                                             <div class="modal-header bg-primary text-white">
-                                                <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Edit Pengguna</h5>
+                                                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit SPAB</h5>
                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <input type="hidden" name="id_pengguna" value="<?php echo $user['id_pengguna']; ?>">
+                                                <input type="hidden" name="id_spab" value="<?php echo $data['id_spab']; ?>">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input name="email" type="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                                    <label class="form-label">Nama Sekolah</label>
+                                                    <input name="nama_sekolah" class="form-control" value="<?php echo htmlspecialchars($data['nama_sekolah']); ?>" required>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label">Password Baru <small class="text-muted">(kosongkan jika tidak diubah)</small></label>
-                                                    <input name="password" type="password" class="form-control">
+                                                    <label class="form-label">Kabupaten</label>
+                                                    <select name="kabupaten" class="form-select" required>
+                                                        <?php foreach (['Sleman','Bantul','Kulon Progo','Gunungkidul','Kota Yogyakarta'] as $kab): ?>
+                                                        <option value="<?php echo $kab; ?>" <?php echo ($data['kabupaten'] == $kab) ? 'selected' : ''; ?>><?php echo $kab; ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label">Role</label>
-                                                    <select name="role" class="form-select" required>
-                                                        <option value="admin" <?php echo ($user['role'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
-                                                        <option value="eksekutif" <?php echo ($user['role'] == 'eksekutif') ? 'selected' : ''; ?>>Eksekutif</option>
+                                                    <label class="form-label">Tahun</label>
+                                                    <input name="tahun" type="number" class="form-control" value="<?php echo $data['tahun']; ?>" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Sumber Pendanaan</label>
+                                                    <input name="sumber_pendanaan" class="form-control" value="<?php echo htmlspecialchars($data['sumber_pendanaan']); ?>" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Tingkatan</label>
+                                                    <select name="tingkatan" class="form-select" required>
+                                                        <?php foreach (['TK','SD','SMP','SMA','SLB'] as $t): ?>
+                                                        <option value="<?php echo $t; ?>" <?php echo ($data['tingkatan'] == $t) ? 'selected' : ''; ?>><?php echo $t; ?></option>
+                                                        <?php endforeach; ?>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" name="updateuser" class="btn btn-primary">Simpan</button>
+                                                <button type="submit" name="updatespab" class="btn btn-primary">Simpan</button>
                                             </div>
                                         </form>
                                     </div>
@@ -248,22 +236,22 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                             </div>
                             
                             <!-- Delete Modal -->
-                            <div class="modal fade" id="deleteModal<?php echo $user['id_pengguna']; ?>" tabindex="-1">
+                            <div class="modal fade" id="deleteModal<?php echo $data['id_spab']; ?>" tabindex="-1">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <form method="post">
                                             <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title"><i class="fas fa-trash me-2"></i>Hapus Pengguna</h5>
+                                                <h5 class="modal-title"><i class="fas fa-trash me-2"></i>Hapus SPAB</h5>
                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <input type="hidden" name="id_pengguna" value="<?php echo $user['id_pengguna']; ?>">
-                                                <p>Hapus <strong><?php echo htmlspecialchars($user['email']); ?></strong>?</p>
+                                                <input type="hidden" name="id_spab" value="<?php echo $data['id_spab']; ?>">
+                                                <p>Hapus <strong><?php echo htmlspecialchars($data['nama_sekolah']); ?></strong>?</p>
                                                 <p class="text-danger small mb-0"><i class="fas fa-exclamation-triangle me-1"></i>Tidak dapat dibatalkan!</p>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" name="deleteuser" class="btn btn-danger">Hapus</button>
+                                                <button type="submit" name="hapusspab" class="btn btn-danger">Hapus</button>
                                             </div>
                                         </form>
                                     </div>
@@ -283,30 +271,48 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             <div class="modal-content">
                 <form method="post">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Tambah Pengguna</h5>
+                        <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Tambah SPAB</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input name="email" type="email" class="form-control" placeholder="email@example.com" required>
+                            <label class="form-label">Nama Sekolah</label>
+                            <input name="nama_sekolah" class="form-control" placeholder="Nama sekolah" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <input name="password" type="password" class="form-control" placeholder="Minimal 6 karakter" required>
+                            <label class="form-label">Kabupaten</label>
+                            <select name="kabupaten" class="form-select" required>
+                                <option value="">Pilih Kabupaten</option>
+                                <option value="Sleman">Sleman</option>
+                                <option value="Bantul">Bantul</option>
+                                <option value="Kulon Progo">Kulon Progo</option>
+                                <option value="Gunungkidul">Gunungkidul</option>
+                                <option value="Kota Yogyakarta">Kota Yogyakarta</option>
+                            </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Role</label>
-                            <select name="role" class="form-select" required>
-                                <option value="">Pilih Role</option>
-                                <option value="admin">Admin</option>
-                                <option value="eksekutif">Eksekutif</option>
+                            <label class="form-label">Tahun</label>
+                            <input name="tahun" type="number" class="form-control" value="<?php echo date('Y'); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sumber Pendanaan</label>
+                            <input name="sumber_pendanaan" class="form-control" placeholder="Contoh: APBD PROVINSI" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tingkatan</label>
+                            <select name="tingkatan" class="form-select" required>
+                                <option value="">Pilih Tingkatan</option>
+                                <option value="TK">TK</option>
+                                <option value="SD">SD</option>
+                                <option value="SMP">SMP</option>
+                                <option value="SMA">SMA</option>
+                                <option value="SLB">SLB</option>
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" name="adduser" class="btn btn-primary">Simpan</button>
+                        <button type="submit" name="addnewspab" class="btn btn-primary">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -318,7 +324,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             const dt = document.getElementById('datatablesSimple');
-            if (dt) new simpleDatatables.DataTable(dt, { perPage: 10, labels: { placeholder: "Cari...", perPage: "{select} per halaman", noRows: "Tidak ada data", info: "{start}-{end} dari {rows}" } });
+            if (dt) new simpleDatatables.DataTable(dt, { perPage: 25, labels: { placeholder: "Cari...", perPage: "{select} per halaman", noRows: "Tidak ada data", info: "{start}-{end} dari {rows}" } });
         });
     </script>
 </body>
