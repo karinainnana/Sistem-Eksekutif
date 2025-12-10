@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin - Kelola Pengguna dengan Sidebar
  * Tema: Biru #043e80, Orange #e64a19
@@ -20,23 +21,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = mysqli_real_escape_string($conn, $_POST['email']);
         $password = mysqli_real_escape_string($conn, $_POST['password']);
         $role = mysqli_real_escape_string($conn, $_POST['role']);
-        
+
         $check = mysqli_query($conn, "SELECT * FROM pengguna WHERE email = '$email'");
         if (mysqli_num_rows($check) > 0) {
             header('Location: users.php?error=email_exists');
             exit;
         }
-        
+
         mysqli_query($conn, "INSERT INTO pengguna (email, password, role) VALUES ('$email', '$password', '$role')");
         header('Location: users.php?success=tambah');
         exit;
     }
-    
+
     if (isset($_POST['updateuser'])) {
         $id = (int)$_POST['id_pengguna'];
         $email = mysqli_real_escape_string($conn, $_POST['email']);
         $role = mysqli_real_escape_string($conn, $_POST['role']);
-        
+
         $query = "UPDATE pengguna SET email='$email', role='$role'";
         if (!empty($_POST['password'])) {
             $password = mysqli_real_escape_string($conn, $_POST['password']);
@@ -47,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: users.php?success=update');
         exit;
     }
-    
+
     if (isset($_POST['deleteuser'])) {
         $id = (int)$_POST['id_pengguna'];
         mysqli_query($conn, "DELETE FROM pengguna WHERE id_pengguna=$id");
@@ -63,88 +64,334 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $page_title; ?> - BPBD PKRR DIY</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    
+
     <style>
-        :root { --primary: #043e80; --secondary: #e64a19; --sidebar-width: 260px; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f4f6f9; }
-        
-        .sidebar { position: fixed; left: 0; top: 0; width: var(--sidebar-width); height: 100vh; background: var(--primary); color: white; z-index: 1000; overflow-y: auto; }
-        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-header h4 { font-weight: 700; margin: 0; font-size: 1.1rem; }
-        .sidebar-header small { opacity: 0.7; font-size: 0.8rem; }
-        .sidebar-menu { padding: 15px 0; }
-        .menu-label { padding: 10px 20px 5px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5; }
-        .sidebar-menu a { display: flex; align-items: center; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none; transition: all 0.3s; border-left: 3px solid transparent; }
-        .sidebar-menu a:hover { background: rgba(255,255,255,0.1); color: white; }
-        .sidebar-menu a.active { background: rgba(255,255,255,0.15); color: white; border-left-color: var(--secondary); }
-        .sidebar-menu a i { width: 20px; min-width: 20px; margin-right: 10px; text-align: center; font-size: 0.95rem; }
-        .sidebar-menu a span { flex: 1; }
-        
-        .main-content { margin-left: var(--sidebar-width); min-height: 100vh; }
-        .topbar { background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .topbar h1 { font-size: 1.3rem; font-weight: 600; color: var(--primary); margin: 0; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-info .badge { background: var(--secondary); }
-        .content-wrapper { padding: 25px; }
-        
-        .card { background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: none; }
-        .card-header { background: var(--primary); color: white; padding: 15px 20px; font-weight: 600; border-radius: 12px 12px 0 0 !important; border: none; display: flex; justify-content: space-between; align-items: center; }
-        .card-body { padding: 20px; }
-        
-        .btn-add { background: var(--secondary); color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.3s; }
-        .btn-add:hover { background: #c43e15; color: white; }
-        
-        .badge-role { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
-        .badge-admin { background: #fee2e2; color: #dc2626; }
-        .badge-eksekutif { background: #dbeafe; color: #2563eb; }
-        
-        .btn-group .btn { padding: 5px 10px; }
-        .modal-header.bg-primary { background: var(--primary) !important; }
-        .modal-header.bg-danger { background: var(--secondary) !important; }
-        .form-control, .form-select { border-radius: 8px; padding: 10px 15px; }
-        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(4, 62, 128, 0.2); }
-        .table thead { background: #f8f9fa; }
-        .table th { font-weight: 600; color: var(--primary); }
-        
+        :root {
+            --primary: #043e80;
+            --secondary: #e64a19;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6f9;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--primary);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h4 {
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-header small {
+            opacity: 0.7;
+            font-size: 0.8rem;
+        }
+
+        .sidebar-menu {
+            padding: 15px 0;
+        }
+
+        .menu-label {
+            padding: 10px 20px 5px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: var(--secondary);
+        }
+
+        .sidebar-menu a i {
+            width: 20px;
+            min-width: 20px;
+            margin-right: 10px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-menu a span {
+            flex: 1;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .topbar h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info .badge {
+            background: var(--secondary);
+        }
+
+        .content-wrapper {
+            padding: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: none;
+        }
+
+        .card-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            border-radius: 12px 12px 0 0 !important;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .btn-add {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #c43e15;
+            color: white;
+        }
+
+        .badge-role {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-admin {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .badge-eksekutif {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .btn-group .btn {
+            padding: 5px 10px;
+        }
+
+        .modal-header.bg-primary {
+            background: var(--primary) !important;
+        }
+
+        .modal-header.bg-danger {
+            background: var(--secondary) !important;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(4, 62, 128, 0.2);
+        }
+
+        .table thead {
+            background: #f8f9fa;
+        }
+
+        .table th {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
         /* Mobile Toggle */
-        .mobile-toggle { display: none; background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
-        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
-        .sidebar-overlay.show { display: block; }
-        
+        .mobile-toggle {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); width: 260px; transition: transform 0.3s; }
-            .sidebar.show { transform: translateX(0); }
-            .main-content { margin-left: 0; }
-            .mobile-toggle { display: block; }
-            .topbar { padding: 12px 15px; flex-wrap: wrap; gap: 10px; }
-            .topbar h1 { font-size: 1.1rem; }
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+                transition: transform 0.3s;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .topbar {
+                padding: 12px 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .topbar h1 {
+                font-size: 1.1rem;
+            }
         }
-        
+
         @media (max-width: 768px) {
-            .content-wrapper { padding: 15px; }
-            .card-header { flex-direction: column; gap: 10px; align-items: flex-start !important; }
-            .table-responsive { font-size: 0.85rem; }
-            .btn-group { display: flex; flex-direction: column; gap: 5px; }
-            .btn-group .btn { width: 100%; }
+            .content-wrapper {
+                padding: 15px;
+            }
+
+            .card-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start !important;
+            }
+
+            .table-responsive {
+                font-size: 0.85rem;
+            }
+
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-group .btn {
+                width: 100%;
+            }
         }
-        
+
         @media (max-width: 576px) {
-            .topbar { flex-direction: column; align-items: flex-start; }
-            .user-info { width: 100%; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px solid #eee;
+            }
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -156,21 +403,21 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             <div class="menu-label">Menu Utama</div>
             <a href="index.php"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
             <a href="users.php" class="active"><i class="fas fa-users-cog"></i><span>Kelola Pengguna</span></a>
-            
+
             <div class="menu-label">Data Master</div>
             <a href="spab.php"><i class="fas fa-school"></i><span>Kelola SPAB</span></a>
             <a href="destana.php"><i class="fas fa-house-user"></i><span>Kelola DESTANA</span></a>
-            
+
             <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
         </div>
     </div>
-    
+
     <script>
-    function confirmLogout() {
-        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-            window.location.href = '../auth/logout.php';
+        function confirmLogout() {
+            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                window.location.href = '../auth/logout.php';
+            }
         }
-    }
     </script>
 
     <!-- Main Content -->
@@ -185,29 +432,35 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 <span class="badge">Admin</span>
             </div>
         </div>
-        
+
         <div class="content-wrapper">
             <?php if (isset($_GET['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>
-                <?php 
-                switch ($_GET['success']) {
-                    case 'tambah': echo 'Pengguna berhasil ditambahkan!'; break;
-                    case 'update': echo 'Pengguna berhasil diperbarui!'; break;
-                    case 'hapus': echo 'Pengguna berhasil dihapus!'; break;
-                }
-                ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <?php
+                    switch ($_GET['success']) {
+                        case 'tambah':
+                            echo 'Pengguna berhasil ditambahkan!';
+                            break;
+                        case 'update':
+                            echo 'Pengguna berhasil diperbarui!';
+                            break;
+                        case 'hapus':
+                            echo 'Pengguna berhasil dihapus!';
+                            break;
+                    }
+                    ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             <?php endif; ?>
-            
+
             <?php if (isset($_GET['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i>Email sudah terdaftar!
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>Email sudah terdaftar!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             <?php endif; ?>
-            
+
             <div class="card">
                 <div class="card-header">
                     <span><i class="fas fa-users me-2"></i>Daftar Pengguna (<?php echo $total_users; ?>)</span>
@@ -226,79 +479,80 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no = 1; while ($user = mysqli_fetch_assoc($allUsers)): ?>
-                            <tr>
-                                <td><?php echo $no++; ?></td>
-                                <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                <td><span class="badge-role badge-<?php echo $user['role']; ?>"><?php echo ucfirst($user['role']); ?></span></td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $user['id_pengguna']; ?>"><i class="fas fa-edit"></i></button>
-                                        <?php if ($user['id_pengguna'] != $user_id): ?>
-                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $user['id_pengguna']; ?>"><i class="fas fa-trash"></i></button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <!-- Edit Modal -->
-                            <div class="modal fade" id="editModal<?php echo $user['id_pengguna']; ?>" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form method="post">
-                                            <div class="modal-header bg-primary text-white">
-                                                <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Edit Pengguna</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <input type="hidden" name="id_pengguna" value="<?php echo $user['id_pengguna']; ?>">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input name="email" type="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                            <?php $no = 1;
+                            while ($user = mysqli_fetch_assoc($allUsers)): ?>
+                                <tr>
+                                    <td><?php echo $no++; ?></td>
+                                    <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                    <td><span class="badge-role badge-<?php echo $user['role']; ?>"><?php echo ucfirst($user['role']); ?></span></td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $user['id_pengguna']; ?>"><i class="fas fa-edit"></i></button>
+                                            <?php if ($user['id_pengguna'] != $user_id): ?>
+                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $user['id_pengguna']; ?>"><i class="fas fa-trash"></i></button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Edit Modal -->
+                                <div class="modal fade" id="editModal<?php echo $user['id_pengguna']; ?>" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="post">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Edit Pengguna</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Password Baru <small class="text-muted">(kosongkan jika tidak diubah)</small></label>
-                                                    <input name="password" type="password" class="form-control">
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="id_pengguna" value="<?php echo $user['id_pengguna']; ?>">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Email</label>
+                                                        <input name="email" type="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Password Baru <small class="text-muted">(kosongkan jika tidak diubah)</small></label>
+                                                        <input name="password" type="password" class="form-control">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Role</label>
+                                                        <select name="role" class="form-select" required>
+                                                            <option value="admin" <?php echo ($user['role'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
+                                                            <option value="eksekutif" <?php echo ($user['role'] == 'eksekutif') ? 'selected' : ''; ?>>Eksekutif</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Role</label>
-                                                    <select name="role" class="form-select" required>
-                                                        <option value="admin" <?php echo ($user['role'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
-                                                        <option value="eksekutif" <?php echo ($user['role'] == 'eksekutif') ? 'selected' : ''; ?>>Eksekutif</option>
-                                                    </select>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                    <button type="submit" name="updateuser" class="btn btn-primary">Simpan</button>
                                                 </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" name="updateuser" class="btn btn-primary">Simpan</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Delete Modal -->
-                            <div class="modal fade" id="deleteModal<?php echo $user['id_pengguna']; ?>" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form method="post">
-                                            <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title"><i class="fas fa-trash me-2"></i>Hapus Pengguna</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <input type="hidden" name="id_pengguna" value="<?php echo $user['id_pengguna']; ?>">
-                                                <p>Hapus <strong><?php echo htmlspecialchars($user['email']); ?></strong>?</p>
-                                                <p class="text-danger small mb-0"><i class="fas fa-exclamation-triangle me-1"></i>Tidak dapat dibatalkan!</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" name="deleteuser" class="btn btn-danger">Hapus</button>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal<?php echo $user['id_pengguna']; ?>" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="post">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title"><i class="fas fa-trash me-2"></i>Hapus Pengguna</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="id_pengguna" value="<?php echo $user['id_pengguna']; ?>">
+                                                    <p>Hapus <strong><?php echo htmlspecialchars($user['email']); ?></strong>?</p>
+                                                    <p class="text-danger small mb-0"><i class="fas fa-exclamation-triangle me-1"></i>Tidak dapat dibatalkan!</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                    <button type="submit" name="deleteuser" class="btn btn-danger">Hapus</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             <?php endwhile; ?>
                         </tbody>
                     </table>
@@ -348,17 +602,26 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             const dt = document.getElementById('datatablesSimple');
-            if (dt) new simpleDatatables.DataTable(dt, { perPage: 10, labels: { placeholder: "Cari...", perPage: "{select} per halaman", noRows: "Tidak ada data", info: "{start}-{end} dari {rows}" } });
+            if (dt) new simpleDatatables.DataTable(dt, {
+                perPage: 10,
+                labels: {
+                    placeholder: "Cari...",
+                    perPage: "{select} per halaman",
+                    noRows: "Tidak ada data",
+                    info: "{start}-{end} dari {rows}"
+                }
+            });
         });
     </script>
-    
+
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <script>
-    function toggleSidebar() {
-        document.querySelector('.sidebar').classList.toggle('show');
-        document.querySelector('.sidebar-overlay').classList.toggle('show');
-    }
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('show');
+            document.querySelector('.sidebar-overlay').classList.toggle('show');
+        }
     </script>
 </body>
+
 </html>

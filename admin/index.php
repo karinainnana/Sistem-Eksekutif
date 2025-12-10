@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin Dashboard dengan Sidebar
  * Tema: Biru #043e80, Orange #e64a19
@@ -37,26 +38,35 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo $page_title; ?> - BPBD PKRR DIY</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
         :root {
             --primary: #043e80;
             --secondary: #e64a19;
             --sidebar-width: 260px;
         }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f4f6f9; }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6f9;
+        }
+
         /* Sidebar */
         .sidebar {
             position: fixed;
@@ -69,28 +79,28 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             z-index: 1000;
             overflow-y: auto;
         }
-        
+
         .sidebar-header {
             padding: 20px;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .sidebar-header h4 {
             font-weight: 700;
             margin: 0;
             font-size: 1.1rem;
         }
-        
+
         .sidebar-header small {
             opacity: 0.7;
             font-size: 0.8rem;
         }
-        
+
         .sidebar-menu {
             padding: 15px 0;
         }
-        
+
         .menu-label {
             padding: 10px 20px 5px;
             font-size: 0.7rem;
@@ -98,28 +108,28 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             letter-spacing: 1px;
             opacity: 0.5;
         }
-        
+
         .sidebar-menu a {
             display: flex;
             align-items: center;
             padding: 12px 20px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: all 0.3s;
             border-left: 3px solid transparent;
         }
-        
+
         .sidebar-menu a:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
-        
+
         .sidebar-menu a.active {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             color: white;
             border-left-color: var(--secondary);
         }
-        
+
         .sidebar-menu a i {
             width: 20px;
             min-width: 20px;
@@ -127,51 +137,51 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             text-align: center;
             font-size: 0.95rem;
         }
-        
+
         .sidebar-menu a span {
             flex: 1;
         }
-        
+
         /* Main Content */
         .main-content {
             margin-left: var(--sidebar-width);
             min-height: 100vh;
             transition: margin-left 0.3s;
         }
-        
+
         .topbar {
             background: white;
             padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             flex-wrap: wrap;
             gap: 10px;
         }
-        
+
         .topbar h1 {
             font-size: 1.3rem;
             font-weight: 600;
             color: var(--primary);
             margin: 0;
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
         }
-        
+
         .user-info .badge {
             background: var(--secondary);
         }
-        
+
         .content-wrapper {
             padding: 20px;
         }
-        
+
         /* Stats Cards */
         .stats-row {
             display: grid;
@@ -179,22 +189,22 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             gap: 20px;
             margin-bottom: 25px;
         }
-        
+
         .stat-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             display: flex;
             align-items: center;
             gap: 15px;
             transition: transform 0.3s;
         }
-        
+
         .stat-card:hover {
             transform: translateY(-3px);
         }
-        
+
         .stat-card .icon {
             width: 55px;
             height: 55px;
@@ -206,34 +216,45 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             color: white;
             flex-shrink: 0;
         }
-        
-        .stat-card .icon.primary { background: var(--primary); }
-        .stat-card .icon.secondary { background: var(--secondary); }
-        .stat-card .icon.success { background: #10b981; }
-        .stat-card .icon.warning { background: #f59e0b; }
-        
+
+        .stat-card .icon.primary {
+            background: var(--primary);
+        }
+
+        .stat-card .icon.secondary {
+            background: var(--secondary);
+        }
+
+        .stat-card .icon.success {
+            background: #10b981;
+        }
+
+        .stat-card .icon.warning {
+            background: #f59e0b;
+        }
+
         .stat-card .info h3 {
             font-size: 1.6rem;
             font-weight: 700;
             color: #333;
             margin: 0;
         }
-        
+
         .stat-card .info p {
             margin: 0;
             color: #666;
             font-size: 0.85rem;
         }
-        
+
         /* Cards */
         .card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             border: none;
             margin-bottom: 25px;
         }
-        
+
         .card-header {
             background: var(--primary);
             color: white;
@@ -242,16 +263,18 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             border-radius: 12px 12px 0 0 !important;
             border: none;
         }
-        
-        .card-body { padding: 20px; }
-        
+
+        .card-body {
+            padding: 20px;
+        }
+
         /* Quick Actions */
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
         }
-        
+
         .action-btn {
             background: #f8f9fa;
             border: 2px solid #e2e8f0;
@@ -262,27 +285,46 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             text-decoration: none;
             transition: all 0.3s;
         }
-        
+
         .action-btn:hover {
             border-color: var(--secondary);
             background: #fff5f2;
             color: var(--secondary);
         }
-        
-        .action-btn i { font-size: 1.8rem; margin-bottom: 10px; display: block; }
-        .action-btn span { font-weight: 500; font-size: 0.9rem; }
-        
+
+        .action-btn i {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .action-btn span {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
         /* Info List */
-        .info-list { list-style: none; padding: 0; margin: 0; }
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
         .info-list li {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #f1f1f1;
         }
-        .info-list li:last-child { border-bottom: none; }
-        .info-list li strong { color: var(--primary); }
-        
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-list li strong {
+            color: var(--primary);
+        }
+
         /* Mobile Toggle Button */
         .mobile-toggle {
             display: none;
@@ -294,76 +336,96 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             cursor: pointer;
             font-size: 1.2rem;
         }
-        
+
         /* Responsive */
         @media (max-width: 1200px) {
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
-        
+
         @media (max-width: 992px) {
-            :root { --sidebar-width: 0px; }
-            
+            :root {
+                --sidebar-width: 0px;
+            }
+
             .sidebar {
                 transform: translateX(-100%);
                 width: 260px;
             }
-            
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
             }
-            
+
             .mobile-toggle {
                 display: block;
             }
-            
+
             .topbar {
                 padding: 12px 15px;
             }
-            
+
             .topbar h1 {
                 font-size: 1.1rem;
             }
         }
-        
+
         @media (max-width: 768px) {
-            .stats-row { grid-template-columns: 1fr; }
-            .quick-actions { grid-template-columns: repeat(2, 1fr); }
-            .content-wrapper { padding: 15px; }
-            
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-wrapper {
+                padding: 15px;
+            }
+
             .stat-card {
                 padding: 15px;
             }
-            
+
             .stat-card .icon {
                 width: 45px;
                 height: 45px;
                 font-size: 1.1rem;
             }
-            
+
             .stat-card .info h3 {
                 font-size: 1.3rem;
             }
-            
+
             .stat-card .info p {
                 font-size: 0.8rem;
             }
-            
-            .row { margin: 0 -10px; }
-            .row > div { padding: 0 10px; margin-bottom: 15px; }
+
+            .row {
+                margin: 0 -10px;
+            }
+
+            .row>div {
+                padding: 0 10px;
+                margin-bottom: 15px;
+            }
         }
-        
+
         @media (max-width: 576px) {
-            .quick-actions { grid-template-columns: 1fr; }
-            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
             .topbar {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .user-info {
                 width: 100%;
                 justify-content: space-between;
@@ -371,17 +433,17 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 padding-top: 10px;
                 border-top: 1px solid #eee;
             }
-            
+
             .action-btn {
                 padding: 15px;
             }
-            
+
             .action-btn i {
                 font-size: 1.4rem;
                 margin-bottom: 8px;
             }
         }
-        
+
         /* Overlay for mobile sidebar */
         .sidebar-overlay {
             display: none;
@@ -390,15 +452,16 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
-        
+
         .sidebar-overlay.show {
             display: block;
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -410,21 +473,21 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             <div class="menu-label">Menu Utama</div>
             <a href="index.php" class="active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
             <a href="users.php"><i class="fas fa-users-cog"></i><span>Kelola Pengguna</span></a>
-            
+
             <div class="menu-label">Data Master</div>
             <a href="spab.php"><i class="fas fa-school"></i><span>Kelola SPAB</span></a>
             <a href="destana.php"><i class="fas fa-house-user"></i><span>Kelola DESTANA</span></a>
-            
+
             <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
         </div>
     </div>
-    
+
     <script>
-    function confirmLogout() {
-        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-            window.location.href = '../auth/logout.php';
+        function confirmLogout() {
+            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                window.location.href = '../auth/logout.php';
+            }
         }
-    }
     </script>
 
     <!-- Main Content -->
@@ -439,7 +502,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 <span class="badge">Admin</span>
             </div>
         </div>
-        
+
         <div class="content-wrapper">
             <!-- Stats -->
             <div class="stats-row">
@@ -472,7 +535,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                     </div>
                 </div>
             </div>
-            
+
             <!-- Quick Actions -->
             <div class="card">
                 <div class="card-header">
@@ -495,7 +558,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                     </div>
                 </div>
             </div>
-            
+
             <!-- Info Section -->
             <div class="row">
                 <div class="col-md-6">
@@ -534,15 +597,16 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
-    
+
     <script>
-    function toggleSidebar() {
-        document.querySelector('.sidebar').classList.toggle('show');
-        document.querySelector('.sidebar-overlay').classList.toggle('show');
-    }
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('show');
+            document.querySelector('.sidebar-overlay').classList.toggle('show');
+        }
     </script>
 </body>
+
 </html>
