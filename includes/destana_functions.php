@@ -43,7 +43,7 @@ function buildDESTANAWhereClause($filters = []) {
 function getAllDESTANA($filters = [], $order = 'ASC') {
     global $conn;
     $where = buildDESTANAWhereClause($filters);
-    $query = "SELECT * FROM destanaa $where ORDER BY desa $order";
+    $query = "SELECT * FROM destana $where ORDER BY desa $order";
     return mysqli_query($conn, $query);
 }
 
@@ -53,7 +53,7 @@ function getAllDESTANA($filters = [], $order = 'ASC') {
 function getDESTANAById($id) {
     global $conn;
     $id = (int)$id;
-    $query = "SELECT * FROM destanaa WHERE id_destana = $id";
+    $query = "SELECT * FROM destana WHERE id_destana = $id";
     $result = mysqli_query($conn, $query);
     return mysqli_fetch_assoc($result);
 }
@@ -72,7 +72,7 @@ function addDESTANA($data) {
     $indeks = floatval($data['indeks']);
     $tingkat = mysqli_real_escape_string($conn, $data['tingkat']);
     
-    $query = "INSERT INTO destanaa (desa, kecamatan, kabupaten, tahun_pembentukan, sumber_pendanaan, indeks, tingkat) 
+    $query = "INSERT INTO destana (desa, kecamatan, kabupaten, tahun_pembentukan, sumber_pendanaan, indeks, tingkat) 
               VALUES ('$desa', '$kecamatan', '$kabupaten', '$tahun_pembentukan', '$sumber_pendanaan', $indeks, '$tingkat')";
     
     return mysqli_query($conn, $query);
@@ -93,7 +93,7 @@ function updateDESTANA($id, $data) {
     $indeks = floatval($data['indeks']);
     $tingkat = mysqli_real_escape_string($conn, $data['tingkat']);
     
-    $query = "UPDATE destanaa SET 
+    $query = "UPDATE destana SET 
               desa = '$desa',
               kecamatan = '$kecamatan',
               kabupaten = '$kabupaten',
@@ -112,7 +112,7 @@ function updateDESTANA($id, $data) {
 function deleteDESTANA($id) {
     global $conn;
     $id = (int)$id;
-    $query = "DELETE FROM destanaa WHERE id_destana = $id";
+    $query = "DELETE FROM destana WHERE id_destana = $id";
     return mysqli_query($conn, $query);
 }
 
@@ -122,7 +122,7 @@ function deleteDESTANA($id) {
 function countTotalDESTANA($filters = []) {
     global $conn;
     $where = buildDESTANAWhereClause($filters);
-    $result = mysqli_query($conn, "SELECT COUNT(*) as total FROM destanaa $where");
+    $result = mysqli_query($conn, "SELECT COUNT(*) as total FROM destana $where");
     $row = mysqli_fetch_assoc($result);
     return (int)$row['total'];
 }
@@ -133,7 +133,7 @@ function countTotalDESTANA($filters = []) {
 function countDESTANAByTingkat($tingkat) {
     global $conn;
     $tingkat = mysqli_real_escape_string($conn, $tingkat);
-    $result = mysqli_query($conn, "SELECT COUNT(*) as total FROM destanaa WHERE tingkat = '$tingkat'");
+    $result = mysqli_query($conn, "SELECT COUNT(*) as total FROM destana WHERE tingkat = '$tingkat'");
     $row = mysqli_fetch_assoc($result);
     return (int)$row['total'];
 }
@@ -145,7 +145,7 @@ function getDESTANAByYear($filters = []) {
     global $conn;
     $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT tahun_pembentukan as label, COUNT(*) as value FROM destanaa $where GROUP BY tahun_pembentukan ORDER BY tahun_pembentukan ASC");
+    $result = mysqli_query($conn, "SELECT tahun_pembentukan as label, COUNT(*) as value FROM destana $where GROUP BY tahun_pembentukan ORDER BY tahun_pembentukan ASC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => (string)$row['label'], 'value' => (int)$row['value']];
     }
@@ -159,7 +159,7 @@ function getDESTANAByKabupaten($filters = []) {
     global $conn;
     $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT kabupaten as label, COUNT(*) as value FROM destanaa $where GROUP BY kabupaten ORDER BY value DESC");
+    $result = mysqli_query($conn, "SELECT kabupaten as label, COUNT(*) as value FROM destana $where GROUP BY kabupaten ORDER BY value DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
     }
@@ -173,7 +173,7 @@ function getDESTANAByTingkat($filters = []) {
     global $conn;
     $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT tingkat as label, COUNT(*) as value FROM destanaa $where GROUP BY tingkat ORDER BY FIELD(tingkat, 'Tangguh Pratama', 'Tangguh Madya', 'Tangguh Utama')");
+    $result = mysqli_query($conn, "SELECT tingkat as label, COUNT(*) as value FROM destana $where GROUP BY tingkat ORDER BY FIELD(tingkat, 'Tangguh Pratama', 'Tangguh Madya', 'Tangguh Utama')");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
     }
@@ -187,7 +187,7 @@ function getDESTANAByPendanaan($filters = []) {
     global $conn;
     $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT sumber_pendanaan as label, COUNT(*) as value FROM destanaa $where GROUP BY sumber_pendanaan ORDER BY value DESC");
+    $result = mysqli_query($conn, "SELECT sumber_pendanaan as label, COUNT(*) as value FROM destana $where GROUP BY sumber_pendanaan ORDER BY value DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
     }
@@ -201,7 +201,7 @@ function getAvgIndeksByKabupaten($filters = []) {
     global $conn;
     $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT kabupaten as label, ROUND(AVG(indeks), 2) as value FROM destanaa $where GROUP BY kabupaten ORDER BY value DESC");
+    $result = mysqli_query($conn, "SELECT kabupaten as label, ROUND(AVG(indeks), 2) as value FROM destana $where GROUP BY kabupaten ORDER BY value DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => floatval($row['value'])];
     }
@@ -214,7 +214,7 @@ function getAvgIndeksByKabupaten($filters = []) {
 function getDestanaKabupatenList() {
     global $conn;
     $data = [];
-    $result = mysqli_query($conn, "SELECT kabupaten, COUNT(*) as total FROM destanaa GROUP BY kabupaten ORDER BY kabupaten ASC");
+    $result = mysqli_query($conn, "SELECT kabupaten, COUNT(*) as total FROM destana GROUP BY kabupaten ORDER BY kabupaten ASC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['nama' => $row['kabupaten'], 'total' => (int)$row['total']];
     }
@@ -227,7 +227,7 @@ function getDestanaKabupatenList() {
 function getKecamatanList($kabupaten = null) {
     global $conn;
     $data = [];
-    $query = "SELECT kecamatan, COUNT(*) as total FROM destanaa";
+    $query = "SELECT kecamatan, COUNT(*) as total FROM destana";
     if ($kabupaten) {
         $kabupaten = mysqli_real_escape_string($conn, $kabupaten);
         $query .= " WHERE kabupaten = '$kabupaten'";
@@ -246,7 +246,7 @@ function getKecamatanList($kabupaten = null) {
 function getTingkatList() {
     global $conn;
     $data = [];
-    $result = mysqli_query($conn, "SELECT tingkat, COUNT(*) as total FROM destanaa GROUP BY tingkat ORDER BY FIELD(tingkat, 'Tangguh Pratama', 'Tangguh Madya', 'Tangguh Utama')");
+    $result = mysqli_query($conn, "SELECT tingkat, COUNT(*) as total FROM destana GROUP BY tingkat ORDER BY FIELD(tingkat, 'Tangguh Pratama', 'Tangguh Madya', 'Tangguh Utama')");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['nama' => $row['tingkat'], 'total' => (int)$row['total']];
     }
@@ -259,7 +259,7 @@ function getTingkatList() {
 function getDestanaTahunList() {
     global $conn;
     $data = [];
-    $result = mysqli_query($conn, "SELECT tahun_pembentukan, COUNT(*) as total FROM destanaa GROUP BY tahun_pembentukan ORDER BY tahun_pembentukan DESC");
+    $result = mysqli_query($conn, "SELECT tahun_pembentukan, COUNT(*) as total FROM destana GROUP BY tahun_pembentukan ORDER BY tahun_pembentukan DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['nama' => $row['tahun_pembentukan'], 'total' => (int)$row['total']];
     }
