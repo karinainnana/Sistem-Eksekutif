@@ -21,12 +21,12 @@ if (!empty($_GET['pendanaan'])) $filters['pendanaan'] = $_GET['pendanaan'];
 if (!empty($_GET['tingkatan'])) $filters['tingkatan'] = $_GET['tingkatan'];
 if (!empty($_GET['tahun'])) $filters['tahun'] = $_GET['tahun'];
 
-// Get statistics
+// Get statistics - with filters
 $total_spab = countTotalSPAB($filters);
-$spab_by_kabupaten = getSPABByKabupaten();
-$spab_by_pendanaan = getSPABByPendanaan();
-$spab_by_tahun = getSPABByYear();
-$spab_by_tingkatan = getSPABByTingkatan();
+$spab_by_kabupaten = getSPABByKabupaten($filters);
+$spab_by_pendanaan = getSPABByPendanaan($filters);
+$spab_by_tahun = getSPABByYear($filters);
+$spab_by_tingkatan = getSPABByTingkatan($filters);
 
 // Get filter lists
 $kabupatenList = getKabupatenList();
@@ -35,7 +35,7 @@ $tingkatanList = getTingkatanList();
 $tahunList = getTahunList();
 
 // Get all SPAB data
-$allSpab = getAllSPAB($filters, 'DESC');
+$allSpab = getAllSPAB($filters, 'ASC');
 
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 ?>
@@ -342,6 +342,9 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                 <div class="icon"><i class="fas fa-school"></i></div>
                 <div class="label">Jumlah SPAB</div>
                 <div class="number"><?php echo number_format($total_spab); ?></div>
+                <?php if (!empty($filters)): ?>
+                <a href="spab.php" class="btn btn-sm btn-light mt-2" style="opacity: 0.9;"><i class="fas fa-times me-1"></i>Reset Filter</a>
+                <?php endif; ?>
             </div>
             
             <!-- Filter: Kabupaten -->
@@ -356,7 +359,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                         <label>
                             <input type="checkbox" name="kabupaten[]" value="<?php echo htmlspecialchars($item['nama']); ?>" 
                                 <?php echo (isset($filters['kabupaten']) && $filters['kabupaten'] == $item['nama']) ? 'checked' : ''; ?>
-                                onchange="applyFilter()">
+                                >
                             <?php echo htmlspecialchars($item['nama']); ?>
                         </label>
                         <span class="count"><?php echo $item['total']; ?></span>
@@ -377,7 +380,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                         <label>
                             <input type="checkbox" name="tingkatan[]" value="<?php echo htmlspecialchars($item['nama']); ?>"
                                 <?php echo (isset($filters['tingkatan']) && $filters['tingkatan'] == $item['nama']) ? 'checked' : ''; ?>
-                                onchange="applyFilter()">
+                                >
                             <?php echo htmlspecialchars($item['nama']); ?>
                         </label>
                         <span class="count"><?php echo $item['total']; ?></span>
@@ -398,7 +401,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                         <label>
                             <input type="checkbox" name="tahun[]" value="<?php echo htmlspecialchars($item['nama']); ?>"
                                 <?php echo (isset($filters['tahun']) && $filters['tahun'] == $item['nama']) ? 'checked' : ''; ?>
-                                onchange="applyFilter()">
+                                >
                             <?php echo htmlspecialchars($item['nama']); ?>
                         </label>
                         <span class="count"><?php echo $item['total']; ?></span>
@@ -452,11 +455,32 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
     
     function applyFilter() {
         const params = new URLSearchParams();
-        document.querySelectorAll('input[name="kabupaten[]"]:checked').forEach(cb => params.set('kabupaten', cb.value));
-        document.querySelectorAll('input[name="tingkatan[]"]:checked').forEach(cb => params.set('tingkatan', cb.value));
-        document.querySelectorAll('input[name="tahun[]"]:checked').forEach(cb => params.set('tahun', cb.value));
+        
+        // Get selected filters
+        const kabupaten = document.querySelector('input[name="kabupaten[]"]:checked');
+        const tingkatan = document.querySelector('input[name="tingkatan[]"]:checked');
+        const tahun = document.querySelector('input[name="tahun[]"]:checked');
+        
+        if (kabupaten) params.set('kabupaten', kabupaten.value);
+        if (tingkatan) params.set('tingkatan', tingkatan.value);
+        if (tahun) params.set('tahun', tahun.value);
+        
         window.location.href = 'spab.php?' + params.toString();
     }
+    
+    // Make checkboxes behave like radio buttons (single selection per category)
+    document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Uncheck other checkboxes in the same category
+                const name = this.name;
+                document.querySelectorAll('input[name="' + name + '"]').forEach(cb => {
+                    if (cb !== this) cb.checked = false;
+                });
+            }
+            applyFilter();
+        });
+    });
     
     // Chart.js - No watermark!
     const primaryColor = '#043e80';

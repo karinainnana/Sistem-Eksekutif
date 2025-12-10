@@ -8,35 +8,42 @@
 require_once dirname(__DIR__) . '/config/config.php';
 
 /**
- * Get all SPAB data with optional filters
+ * Build WHERE clause from filters
  */
-function getAllSPAB($filters = [], $order = 'ASC') {
+function buildSPABWhereClause($filters = []) {
     global $conn;
-    
-    $query = "SELECT * FROM spab WHERE 1=1";
+    $where = " WHERE 1=1";
     
     if (!empty($filters['kabupaten'])) {
         $kabupaten = mysqli_real_escape_string($conn, $filters['kabupaten']);
-        $query .= " AND kabupaten = '$kabupaten'";
+        $where .= " AND kabupaten = '$kabupaten'";
     }
     
     if (!empty($filters['tingkatan'])) {
         $tingkatan = mysqli_real_escape_string($conn, $filters['tingkatan']);
-        $query .= " AND tingkatan = '$tingkatan'";
+        $where .= " AND tingkatan = '$tingkatan'";
     }
     
     if (!empty($filters['tahun'])) {
         $tahun = mysqli_real_escape_string($conn, $filters['tahun']);
-        $query .= " AND tahun = '$tahun'";
+        $where .= " AND tahun = '$tahun'";
     }
     
     if (!empty($filters['sumber_pendanaan'])) {
         $pendanaan = mysqli_real_escape_string($conn, $filters['sumber_pendanaan']);
-        $query .= " AND sumber_pendanaan LIKE '%$pendanaan%'";
+        $where .= " AND sumber_pendanaan LIKE '%$pendanaan%'";
     }
     
-    $query .= " ORDER BY id_spab $order";
-    
+    return $where;
+}
+
+/**
+ * Get all SPAB data with optional filters
+ */
+function getAllSPAB($filters = [], $order = 'ASC') {
+    global $conn;
+    $where = buildSPABWhereClause($filters);
+    $query = "SELECT * FROM spab $where ORDER BY nama_sekolah $order";
     return mysqli_query($conn, $query);
 }
 
@@ -108,25 +115,8 @@ function deleteSPAB($id) {
  */
 function countTotalSPAB($filters = []) {
     global $conn;
-    
-    $query = "SELECT COUNT(*) as total FROM spab WHERE 1=1";
-    
-    if (!empty($filters['kabupaten'])) {
-        $kabupaten = mysqli_real_escape_string($conn, $filters['kabupaten']);
-        $query .= " AND kabupaten = '$kabupaten'";
-    }
-    
-    if (!empty($filters['tingkatan'])) {
-        $tingkatan = mysqli_real_escape_string($conn, $filters['tingkatan']);
-        $query .= " AND tingkatan = '$tingkatan'";
-    }
-    
-    if (!empty($filters['tahun'])) {
-        $tahun = mysqli_real_escape_string($conn, $filters['tahun']);
-        $query .= " AND tahun = '$tahun'";
-    }
-    
-    $result = mysqli_query($conn, $query);
+    $where = buildSPABWhereClause($filters);
+    $result = mysqli_query($conn, "SELECT COUNT(*) as total FROM spab $where");
     $row = mysqli_fetch_assoc($result);
     return (int)$row['total'];
 }
@@ -143,12 +133,13 @@ function countSPABByTingkatan($tingkatan) {
 }
 
 /**
- * Get SPAB data grouped by year (for charts)
+ * Get SPAB data grouped by year (for charts) - with filters
  */
-function getSPABByYear() {
+function getSPABByYear($filters = []) {
     global $conn;
+    $where = buildSPABWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT tahun as label, COUNT(*) as value FROM spab GROUP BY tahun ORDER BY tahun ASC");
+    $result = mysqli_query($conn, "SELECT tahun as label, COUNT(*) as value FROM spab $where GROUP BY tahun ORDER BY tahun ASC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => (string)$row['label'], 'value' => (int)$row['value']];
     }
@@ -156,12 +147,13 @@ function getSPABByYear() {
 }
 
 /**
- * Get SPAB data grouped by kabupaten (for charts)
+ * Get SPAB data grouped by kabupaten (for charts) - with filters
  */
-function getSPABByKabupaten() {
+function getSPABByKabupaten($filters = []) {
     global $conn;
+    $where = buildSPABWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT kabupaten as label, COUNT(*) as value FROM spab GROUP BY kabupaten ORDER BY value DESC");
+    $result = mysqli_query($conn, "SELECT kabupaten as label, COUNT(*) as value FROM spab $where GROUP BY kabupaten ORDER BY value DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
     }
@@ -169,12 +161,13 @@ function getSPABByKabupaten() {
 }
 
 /**
- * Get SPAB data grouped by tingkatan (for charts)
+ * Get SPAB data grouped by tingkatan (for charts) - with filters
  */
-function getSPABByTingkatan() {
+function getSPABByTingkatan($filters = []) {
     global $conn;
+    $where = buildSPABWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT tingkatan as label, COUNT(*) as value FROM spab GROUP BY tingkatan ORDER BY tingkatan ASC");
+    $result = mysqli_query($conn, "SELECT tingkatan as label, COUNT(*) as value FROM spab $where GROUP BY tingkatan ORDER BY tingkatan ASC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
     }
@@ -182,12 +175,13 @@ function getSPABByTingkatan() {
 }
 
 /**
- * Get SPAB data grouped by sumber pendanaan (for charts)
+ * Get SPAB data grouped by sumber pendanaan (for charts) - with filters
  */
-function getSPABByPendanaan() {
+function getSPABByPendanaan($filters = []) {
     global $conn;
+    $where = buildSPABWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT sumber_pendanaan as label, COUNT(*) as value FROM spab GROUP BY sumber_pendanaan ORDER BY value DESC");
+    $result = mysqli_query($conn, "SELECT sumber_pendanaan as label, COUNT(*) as value FROM spab $where GROUP BY sumber_pendanaan ORDER BY value DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
     }

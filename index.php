@@ -2,7 +2,6 @@
 /**
  * Dashboard Eksekutif Utama
  * Tema: Biru #043e80, Orange #e64a19
- * Chart: Chart.js (tanpa watermark)
  */
 
 $page_title = 'Dashboard Eksekutif';
@@ -18,10 +17,6 @@ if (!isset($_SESSION['log']) || $_SESSION['log'] !== true) {
 // Get statistics
 $total_spab = countTotalSPAB();
 $total_destana = countTotalDESTANA();
-$spab_by_kabupaten = getSPABByKabupaten();
-$spab_by_tahun = getSPABByYear();
-$destana_by_kabupaten = getDESTANAByKabupaten();
-$destana_by_tahun = getDESTANAByYear();
 $spab_by_tingkatan = getSPABByTingkatan();
 $destana_by_tingkat = getDESTANAByTingkat();
 
@@ -38,7 +33,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root {
@@ -337,27 +331,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             <span>Kelola DESTANA</span>
         </a>
         <?php endif; ?>
-    </div>
-    
-    <!-- Charts Grid -->
-    <div class="charts-grid">
-        <div class="chart-card">
-            <div class="chart-header primary"><i class="fas fa-chart-bar"></i>SPAB per Kabupaten</div>
-            <div class="chart-body"><canvas id="chartSpabKab" height="250"></canvas></div>
-        </div>
-        <div class="chart-card">
-            <div class="chart-header secondary"><i class="fas fa-chart-bar"></i>DESTANA per Kabupaten</div>
-            <div class="chart-body"><canvas id="chartDestanaKab" height="250"></canvas></div>
-        </div>
-        <div class="chart-card">
-            <div class="chart-header primary"><i class="fas fa-chart-line"></i>Trend SPAB per Tahun</div>
-            <div class="chart-body"><canvas id="chartSpabTahun" height="250"></canvas></div>
-        </div>
-        <div class="chart-card">
-            <div class="chart-header secondary"><i class="fas fa-chart-line"></i>Trend DESTANA per Tahun</div>
-            <div class="chart-body"><canvas id="chartDestanaTahun" height="250"></canvas></div>
-        </div>
-    </div>
     
     <!-- Breakdown Cards -->
     <div class="breakdown-grid">
@@ -392,89 +365,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-    const primaryColor = '#043e80';
-    const secondaryColor = '#e64a19';
-    
-    // Chart 1: SPAB per Kabupaten
-    new Chart(document.getElementById('chartSpabKab'), {
-        type: 'bar',
-        data: {
-            labels: <?php echo json_encode(array_column($spab_by_kabupaten, 'label')); ?>,
-            datasets: [{
-                label: 'Jumlah SPAB',
-                data: <?php echo json_encode(array_column($spab_by_kabupaten, 'value')); ?>,
-                backgroundColor: primaryColor,
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-    
-    // Chart 2: DESTANA per Kabupaten
-    new Chart(document.getElementById('chartDestanaKab'), {
-        type: 'bar',
-        data: {
-            labels: <?php echo json_encode(array_column($destana_by_kabupaten, 'label')); ?>,
-            datasets: [{
-                label: 'Jumlah DESTANA',
-                data: <?php echo json_encode(array_column($destana_by_kabupaten, 'value')); ?>,
-                backgroundColor: secondaryColor,
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-    
-    // Chart 3: SPAB per Tahun
-    new Chart(document.getElementById('chartSpabTahun'), {
-        type: 'line',
-        data: {
-            labels: <?php echo json_encode(array_column($spab_by_tahun, 'label')); ?>,
-            datasets: [{
-                label: 'Jumlah SPAB',
-                data: <?php echo json_encode(array_column($spab_by_tahun, 'value')); ?>,
-                borderColor: primaryColor,
-                backgroundColor: 'rgba(4, 62, 128, 0.1)',
-                tension: 0.3,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-    
-    // Chart 4: DESTANA per Tahun
-    new Chart(document.getElementById('chartDestanaTahun'), {
-        type: 'line',
-        data: {
-            labels: <?php echo json_encode(array_column($destana_by_tahun, 'label')); ?>,
-            datasets: [{
-                label: 'Jumlah DESTANA',
-                data: <?php echo json_encode(array_column($destana_by_tahun, 'value')); ?>,
-                borderColor: secondaryColor,
-                backgroundColor: 'rgba(230, 74, 25, 0.1)',
-                tension: 0.3,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-    
     function confirmLogout() {
         if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
             window.location.href = 'auth/logout.php';

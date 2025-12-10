@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$allUsers = mysqli_query($conn, "SELECT * FROM pengguna ORDER BY id_pengguna ASC");
+$allUsers = mysqli_query($conn, "SELECT * FROM pengguna ORDER BY email ASC");
 $total_users = mysqli_num_rows($allUsers);
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
@@ -132,8 +132,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             <a href="spab.php"><i class="fas fa-school"></i> Kelola SPAB</a>
             <a href="destana.php"><i class="fas fa-house-user"></i> Kelola DESTANA</a>
             
-            <div class="menu-label">Lainnya</div>
-            <a href="../index.php"><i class="fas fa-desktop"></i> Lihat Eksekutif</a>
             <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>

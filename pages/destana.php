@@ -20,12 +20,12 @@ if (!empty($_GET['kabupaten'])) $filters['kabupaten'] = $_GET['kabupaten'];
 if (!empty($_GET['tingkat'])) $filters['tingkat'] = $_GET['tingkat'];
 if (!empty($_GET['tahun_pembentukan'])) $filters['tahun_pembentukan'] = $_GET['tahun_pembentukan'];
 
-// Get statistics
+// Get statistics - with filters
 $total_destana = countTotalDESTANA($filters);
-$destana_by_kabupaten = getDESTANAByKabupaten();
-$destana_by_tingkat = getDESTANAByTingkat();
-$destana_by_tahun = getDESTANAByYear();
-$avg_indeks = getAvgIndeksByKabupaten();
+$destana_by_kabupaten = getDESTANAByKabupaten($filters);
+$destana_by_tingkat = getDESTANAByTingkat($filters);
+$destana_by_tahun = getDESTANAByYear($filters);
+$avg_indeks = getAvgIndeksByKabupaten($filters);
 
 // Get filter lists
 $kabupatenList = getDestanaKabupatenList();
@@ -33,7 +33,7 @@ $tingkatList = getTingkatList();
 $tahunList = getDestanaTahunList();
 
 // Get all DESTANA data
-$allDestana = getAllDESTANA($filters, 'DESC');
+$allDestana = getAllDESTANA($filters, 'ASC');
 
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 ?>
@@ -338,6 +338,9 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                 <div class="icon"><i class="fas fa-house-user"></i></div>
                 <div class="label">Jumlah DESTANA</div>
                 <div class="number"><?php echo number_format($total_destana); ?></div>
+                <?php if (!empty($filters)): ?>
+                <a href="destana.php" class="btn btn-sm btn-light mt-2" style="opacity: 0.9;"><i class="fas fa-times me-1"></i>Reset Filter</a>
+                <?php endif; ?>
             </div>
             
             <!-- Filter: Kabupaten -->
@@ -352,7 +355,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                         <label>
                             <input type="checkbox" name="kabupaten[]" value="<?php echo htmlspecialchars($item['nama']); ?>" 
                                 <?php echo (isset($filters['kabupaten']) && $filters['kabupaten'] == $item['nama']) ? 'checked' : ''; ?>
-                                onchange="applyFilter()">
+                                >
                             <?php echo htmlspecialchars($item['nama']); ?>
                         </label>
                         <span class="count"><?php echo $item['total']; ?></span>
@@ -373,7 +376,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                         <label>
                             <input type="checkbox" name="tingkat[]" value="<?php echo htmlspecialchars($item['nama']); ?>"
                                 <?php echo (isset($filters['tingkat']) && $filters['tingkat'] == $item['nama']) ? 'checked' : ''; ?>
-                                onchange="applyFilter()">
+                                >
                             <?php echo htmlspecialchars($item['nama']); ?>
                         </label>
                         <span class="count"><?php echo $item['total']; ?></span>
@@ -394,7 +397,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                         <label>
                             <input type="checkbox" name="tahun[]" value="<?php echo htmlspecialchars($item['nama']); ?>"
                                 <?php echo (isset($filters['tahun_pembentukan']) && $filters['tahun_pembentukan'] == $item['nama']) ? 'checked' : ''; ?>
-                                onchange="applyFilter()">
+                                >
                             <?php echo htmlspecialchars($item['nama']); ?>
                         </label>
                         <span class="count"><?php echo $item['total']; ?></span>
@@ -448,11 +451,32 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
     
     function applyFilter() {
         const params = new URLSearchParams();
-        document.querySelectorAll('input[name="kabupaten[]"]:checked').forEach(cb => params.set('kabupaten', cb.value));
-        document.querySelectorAll('input[name="tingkat[]"]:checked').forEach(cb => params.set('tingkat', cb.value));
-        document.querySelectorAll('input[name="tahun[]"]:checked').forEach(cb => params.set('tahun_pembentukan', cb.value));
+        
+        // Get selected filters
+        const kabupaten = document.querySelector('input[name="kabupaten[]"]:checked');
+        const tingkat = document.querySelector('input[name="tingkat[]"]:checked');
+        const tahun = document.querySelector('input[name="tahun[]"]:checked');
+        
+        if (kabupaten) params.set('kabupaten', kabupaten.value);
+        if (tingkat) params.set('tingkat', tingkat.value);
+        if (tahun) params.set('tahun_pembentukan', tahun.value);
+        
         window.location.href = 'destana.php?' + params.toString();
     }
+    
+    // Make checkboxes behave like radio buttons (single selection per category)
+    document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Uncheck other checkboxes in the same category
+                const name = this.name;
+                document.querySelectorAll('input[name="' + name + '"]').forEach(cb => {
+                    if (cb !== this) cb.checked = false;
+                });
+            }
+            applyFilter();
+        });
+    });
     
     // Chart.js - No watermark!
     const primaryColor = '#043e80';

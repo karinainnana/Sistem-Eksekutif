@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$allDestana = getAllDESTANA([], 'DESC');
+$allDestana = getAllDESTANA([], 'ASC');
 $total_destana = countTotalDESTANA();
 $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 ?>
@@ -109,8 +109,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             <a href="spab.php"><i class="fas fa-school"></i> Kelola SPAB</a>
             <a href="destana.php" class="active"><i class="fas fa-house-user"></i> Kelola DESTANA</a>
             
-            <div class="menu-label">Lainnya</div>
-            <a href="../index.php"><i class="fas fa-desktop"></i> Lihat Eksekutif</a>
             <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>

@@ -289,8 +289,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             <a href="spab.php"><i class="fas fa-school"></i> Kelola SPAB</a>
             <a href="destana.php"><i class="fas fa-house-user"></i> Kelola DESTANA</a>
             
-            <div class="menu-label">Lainnya</div>
-            <a href="../index.php"><i class="fas fa-desktop"></i> Lihat Eksekutif</a>
             <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>
@@ -364,11 +362,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                         <a href="destana.php" class="action-btn">
                             <i class="fas fa-plus-circle"></i>
                             <span>Kelola DESTANA</span>
-                        </a>
-                        <a href="../index.php" class="action-btn">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Lihat Eksekutif</span>
-                        </a>
                     </div>
                 </div>
             </div>

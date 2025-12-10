@@ -8,35 +8,42 @@
 require_once dirname(__DIR__) . '/config/config.php';
 
 /**
- * Get all DESTANA data with optional filters
+ * Build WHERE clause from filters
  */
-function getAllDESTANA($filters = [], $order = 'ASC') {
+function buildDESTANAWhereClause($filters = []) {
     global $conn;
-    
-    $query = "SELECT * FROM destanaa WHERE 1=1";
+    $where = " WHERE 1=1";
     
     if (!empty($filters['kabupaten'])) {
         $kabupaten = mysqli_real_escape_string($conn, $filters['kabupaten']);
-        $query .= " AND kabupaten = '$kabupaten'";
+        $where .= " AND kabupaten = '$kabupaten'";
     }
     
     if (!empty($filters['kecamatan'])) {
         $kecamatan = mysqli_real_escape_string($conn, $filters['kecamatan']);
-        $query .= " AND kecamatan = '$kecamatan'";
+        $where .= " AND kecamatan = '$kecamatan'";
     }
     
     if (!empty($filters['tingkat'])) {
         $tingkat = mysqli_real_escape_string($conn, $filters['tingkat']);
-        $query .= " AND tingkat = '$tingkat'";
+        $where .= " AND tingkat = '$tingkat'";
     }
     
     if (!empty($filters['tahun_pembentukan'])) {
         $tahun = mysqli_real_escape_string($conn, $filters['tahun_pembentukan']);
-        $query .= " AND tahun_pembentukan = '$tahun'";
+        $where .= " AND tahun_pembentukan = '$tahun'";
     }
     
-    $query .= " ORDER BY id_destana $order";
-    
+    return $where;
+}
+
+/**
+ * Get all DESTANA data with optional filters
+ */
+function getAllDESTANA($filters = [], $order = 'ASC') {
+    global $conn;
+    $where = buildDESTANAWhereClause($filters);
+    $query = "SELECT * FROM destanaa $where ORDER BY desa $order";
     return mysqli_query($conn, $query);
 }
 
@@ -114,20 +121,8 @@ function deleteDESTANA($id) {
  */
 function countTotalDESTANA($filters = []) {
     global $conn;
-    
-    $query = "SELECT COUNT(*) as total FROM destanaa WHERE 1=1";
-    
-    if (!empty($filters['kabupaten'])) {
-        $kabupaten = mysqli_real_escape_string($conn, $filters['kabupaten']);
-        $query .= " AND kabupaten = '$kabupaten'";
-    }
-    
-    if (!empty($filters['tingkat'])) {
-        $tingkat = mysqli_real_escape_string($conn, $filters['tingkat']);
-        $query .= " AND tingkat = '$tingkat'";
-    }
-    
-    $result = mysqli_query($conn, $query);
+    $where = buildDESTANAWhereClause($filters);
+    $result = mysqli_query($conn, "SELECT COUNT(*) as total FROM destanaa $where");
     $row = mysqli_fetch_assoc($result);
     return (int)$row['total'];
 }
@@ -144,12 +139,13 @@ function countDESTANAByTingkat($tingkat) {
 }
 
 /**
- * Get DESTANA data grouped by year (for charts)
+ * Get DESTANA data grouped by year (for charts) - with filters
  */
-function getDESTANAByYear() {
+function getDESTANAByYear($filters = []) {
     global $conn;
+    $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT tahun_pembentukan as label, COUNT(*) as value FROM destanaa GROUP BY tahun_pembentukan ORDER BY tahun_pembentukan ASC");
+    $result = mysqli_query($conn, "SELECT tahun_pembentukan as label, COUNT(*) as value FROM destanaa $where GROUP BY tahun_pembentukan ORDER BY tahun_pembentukan ASC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => (string)$row['label'], 'value' => (int)$row['value']];
     }
@@ -157,12 +153,13 @@ function getDESTANAByYear() {
 }
 
 /**
- * Get DESTANA data grouped by kabupaten (for charts)
+ * Get DESTANA data grouped by kabupaten (for charts) - with filters
  */
-function getDESTANAByKabupaten() {
+function getDESTANAByKabupaten($filters = []) {
     global $conn;
+    $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT kabupaten as label, COUNT(*) as value FROM destanaa GROUP BY kabupaten ORDER BY value DESC");
+    $result = mysqli_query($conn, "SELECT kabupaten as label, COUNT(*) as value FROM destanaa $where GROUP BY kabupaten ORDER BY value DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
     }
@@ -170,12 +167,13 @@ function getDESTANAByKabupaten() {
 }
 
 /**
- * Get DESTANA data grouped by tingkat (for charts)
+ * Get DESTANA data grouped by tingkat (for charts) - with filters
  */
-function getDESTANAByTingkat() {
+function getDESTANAByTingkat($filters = []) {
     global $conn;
+    $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT tingkat as label, COUNT(*) as value FROM destanaa GROUP BY tingkat ORDER BY FIELD(tingkat, 'Tangguh Pratama', 'Tangguh Madya', 'Tangguh Utama')");
+    $result = mysqli_query($conn, "SELECT tingkat as label, COUNT(*) as value FROM destanaa $where GROUP BY tingkat ORDER BY FIELD(tingkat, 'Tangguh Pratama', 'Tangguh Madya', 'Tangguh Utama')");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
     }
@@ -183,14 +181,29 @@ function getDESTANAByTingkat() {
 }
 
 /**
- * Get DESTANA data grouped by sumber pendanaan (for charts)
+ * Get DESTANA data grouped by sumber pendanaan (for charts) - with filters
  */
-function getDESTANAByPendanaan() {
+function getDESTANAByPendanaan($filters = []) {
     global $conn;
+    $where = buildDESTANAWhereClause($filters);
     $data = [];
-    $result = mysqli_query($conn, "SELECT sumber_pendanaan as label, COUNT(*) as value FROM destanaa GROUP BY sumber_pendanaan ORDER BY value DESC");
+    $result = mysqli_query($conn, "SELECT sumber_pendanaan as label, COUNT(*) as value FROM destanaa $where GROUP BY sumber_pendanaan ORDER BY value DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['label' => $row['label'], 'value' => (int)$row['value']];
+    }
+    return $data;
+}
+
+/**
+ * Get average indeks by kabupaten - with filters
+ */
+function getAvgIndeksByKabupaten($filters = []) {
+    global $conn;
+    $where = buildDESTANAWhereClause($filters);
+    $data = [];
+    $result = mysqli_query($conn, "SELECT kabupaten as label, ROUND(AVG(indeks), 2) as value FROM destanaa $where GROUP BY kabupaten ORDER BY value DESC");
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = ['label' => $row['label'], 'value' => floatval($row['value'])];
     }
     return $data;
 }
@@ -249,19 +262,6 @@ function getDestanaTahunList() {
     $result = mysqli_query($conn, "SELECT tahun_pembentukan, COUNT(*) as total FROM destanaa GROUP BY tahun_pembentukan ORDER BY tahun_pembentukan DESC");
     while ($row = mysqli_fetch_assoc($result)) {
         $data[] = ['nama' => $row['tahun_pembentukan'], 'total' => (int)$row['total']];
-    }
-    return $data;
-}
-
-/**
- * Get average indeks by kabupaten
- */
-function getAvgIndeksByKabupaten() {
-    global $conn;
-    $data = [];
-    $result = mysqli_query($conn, "SELECT kabupaten as label, ROUND(AVG(indeks), 2) as value FROM destanaa GROUP BY kabupaten ORDER BY value DESC");
-    while ($row = mysqli_fetch_assoc($result)) {
-        $data[] = ['label' => $row['label'], 'value' => floatval($row['value'])];
     }
     return $data;
 }
