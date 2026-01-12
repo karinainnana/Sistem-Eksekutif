@@ -165,18 +165,18 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         .main-content {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
         
         .charts-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
         }
         
         .chart-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
@@ -184,14 +184,15 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         .chart-card .chart-header {
             background: var(--primary);
             color: white;
-            padding: 12px 15px;
+            padding: 8px 12px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
         
         .chart-card .chart-body {
-            padding: 15px;
+            padding: 8px 10px;
             background: white;
+            height: 140px;
         }
         
         /* Table */
@@ -414,11 +415,11 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
             <div class="charts-row">
                 <div class="chart-card">
                     <div class="chart-header"><i class="fas fa-chart-bar me-2"></i>Jumlah SPAB per Kabupaten</div>
-                    <div class="chart-body"><canvas id="chartKabupaten" height="250"></canvas></div>
+                    <div class="chart-body"><canvas id="chartKabupaten"></canvas></div>
                 </div>
                 <div class="chart-card">
                     <div class="chart-header"><i class="fas fa-chart-pie me-2"></i>Persentase Sumber Dana</div>
-                    <div class="chart-body"><canvas id="chartPendanaan" height="250"></canvas></div>
+                    <div class="chart-body"><canvas id="chartPendanaan"></canvas></div>
                 </div>
             </div>
             
@@ -426,11 +427,11 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
             <div class="charts-row">
                 <div class="chart-card">
                     <div class="chart-header"><i class="fas fa-chart-line me-2"></i>Trend SPAB per Tahun</div>
-                    <div class="chart-body"><canvas id="chartTahun" height="250"></canvas></div>
+                    <div class="chart-body"><canvas id="chartTahun"></canvas></div>
                 </div>
                 <div class="chart-card">
                     <div class="chart-header"><i class="fas fa-chart-pie me-2"></i>Persentase Tingkatan</div>
-                    <div class="chart-body"><canvas id="chartTingkatan" height="250"></canvas></div>
+                    <div class="chart-body"><canvas id="chartTingkatan"></canvas></div>
                 </div>
             </div>
             
@@ -498,6 +499,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true } }
         }
@@ -515,7 +517,8 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         },
         options: {
             responsive: true,
-            plugins: { legend: { position: 'right' } }
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } } }
         }
     });
     
@@ -535,6 +538,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true } }
         }
@@ -552,7 +556,8 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         },
         options: {
             responsive: true,
-            plugins: { legend: { position: 'right' } }
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } } }
         }
     });
     
