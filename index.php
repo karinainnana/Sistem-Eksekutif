@@ -255,13 +255,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             color: var(--secondary);
         }
         
-        /* Admin Quick Links */
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 35px;
-        }
+
         
         .quick-link {
             background: rgba(255,255,255,0.12);
@@ -399,9 +393,6 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 <a href="index.php" class="active">Dashboard</a>
                 <a href="pages/spab.php">SPAB</a>
                 <a href="pages/destana.php">DESTANA</a>
-                <?php if ($user_role == 'admin'): ?>
-                <a href="admin/index.php">Admin</a>
-                <?php endif; ?>
                 <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
             </div>
         </div>
@@ -419,7 +410,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 <div class="info">
                     <h3><?php echo number_format($total_spab); ?></h3>
                     <p>Total SPAB</p>
-                    <small>Sekolah/Madrasah Aman Bencana</small>
+                    <small>Satuan Pendidikan Aman Bencana</small>
                 </div>
             </div>
             <div class="stat-card">
@@ -448,20 +439,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             </a>
         </div>
         
-        <!-- Admin Quick Links -->
-        <?php if ($user_role == 'admin'): ?>
-        <div class="quick-links">
-            <a href="admin/spab.php" class="quick-link">
-                <i class="fas fa-edit" style="font-size: 2rem; margin-bottom: 12px; display: block; color: var(--secondary);"></i>
-                <span style="font-weight: 600; font-size: 0.95rem;">Kelola SPAB</span>
-            </a>
-            <a href="admin/destana.php" class="quick-link">
-                <i class="fas fa-cog" style="font-size: 2rem; margin-bottom: 12px; display: block; color: var(--secondary);"></i>
-                <span style="font-weight: 600; font-size: 0.95rem;">Kelola DESTANA</span>
-            </a>
-        </div>
-        <?php endif; ?>
-        
+       
         <!-- Breakdown Cards -->
         <div class="breakdown-grid">
             <div class="breakdown-card">

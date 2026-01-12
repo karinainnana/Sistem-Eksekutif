@@ -319,7 +319,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input name="email" type="email" class="form-control" placeholder="email@example.com" required>
+                            <input name="email" type="email" class="form-control" placeholder="email@gmail.com" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>

@@ -323,14 +323,11 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 <body>
     <!-- Navigation -->
     <div class="nav-header">
-        <div class="brand"><i class="fas fa-shield-alt me-2"></i>BPBD PKRR DIY</div>
+        <div class="brand"><i class="fas fa-shield-alt me-2"></i>DATA SATUAN PENDIDIKAN AMAN BENCANA</div>
         <div class="nav-links">
             <a href="../index.php">Dashboard</a>
             <a href="spab.php" class="active">SPAB</a>
             <a href="destana.php">DESTANA</a>
-            <?php if ($user_role == 'admin'): ?>
-            <a href="../admin/index.php">Admin</a>
-            <?php endif; ?>
             <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
         </div>
     </div>
