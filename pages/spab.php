@@ -82,15 +82,15 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         
         .total-card {
             background: linear-gradient(135deg, var(--secondary) 0%, #c43e15 100%);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 12px 15px;
             color: white;
             text-align: center;
         }
         
-        .total-card .icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.9; }
-        .total-card .number { font-size: 3rem; font-weight: 700; line-height: 1; }
-        .total-card .label { font-size: 1rem; opacity: 0.9; margin-top: 5px; }
+        .total-card .icon { font-size: 1.8rem; margin-bottom: 5px; opacity: 0.9; }
+        .total-card .number { font-size: 2rem; font-weight: 700; line-height: 1; }
+        .total-card .label { font-size: 0.85rem; opacity: 0.9; margin-top: 3px; }
         
         .filter-card {
             background: rgba(255,255,255,0.1);
@@ -192,7 +192,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         .chart-card .chart-body {
             padding: 8px 10px;
             background: white;
-            height: 140px;
+            height: 180px;
         }
         
         /* Table */
