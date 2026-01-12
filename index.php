@@ -494,7 +494,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 <a href="index.php" class="active">Dashboard</a>
                 <a href="pages/spab.php">SPAB</a>
                 <a href="pages/destana.php">DESTANA</a>
-                <?php if ($user_role == 'admin'): ?>
+<?php if ($user_role == 'admin'): ?>
                     <a href="admin/index.php">Admin</a>
                 <?php endif; ?>
                 <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
@@ -514,7 +514,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 <div class="info">
                     <h3><?php echo number_format($total_spab); ?></h3>
                     <p>Total SPAB</p>
-                    <small>Sekolah/Madrasah Aman Bencana</small>
+                    <small>Satuan Pendidikan Aman Bencana</small>
                 </div>
             </div>
             <div class="stat-card">
