@@ -30,7 +30,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?php echo $page_title; ?> - BPBD PKRR DIY</title>
+    <title><?php echo $page_title; ?> - PKRR BPBD DIY</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -276,13 +276,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             color: var(--secondary);
         }
 
-        /* Admin Quick Links */
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 35px;
-        }
+    
 
         .quick-link {
             background: rgba(255, 255, 255, 0.12);
@@ -489,21 +483,19 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <div class="container-main">
         <!-- Navigation -->
         <div class="nav-header">
-            <div class="brand"><i class="fas fa-shield-alt"></i>BPBD PKRR DIY</div>
+            <div class="brand"><i class="fas fa-shield-alt"></i> PKRR BPBD DIY</div>
             <div class="nav-links">
                 <a href="index.php" class="active">Dashboard</a>
                 <a href="pages/spab.php">SPAB</a>
                 <a href="pages/destana.php">DESTANA</a>
-<?php if ($user_role == 'admin'): ?>
-                    <a href="admin/index.php">Admin</a>
-                <?php endif; ?>
+                
                 <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
             </div>
         </div>
 
         <!-- Welcome Section -->
         <div class="welcome-section">
-            <h1><i class="fas fa-chart-line me-3"></i>Sistem Informasi Eksekutif</h1>
+            <h1><i class="fas fa-chart-line me-3"></i>Sistem Informasi SPAB & DESTANA</h1>
             <p>Selamat datang, <strong><?php echo htmlspecialchars($user_email); ?></strong> | <?php echo date('l, d F Y'); ?></p>
         </div>
 
@@ -543,19 +535,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
             </a>
         </div>
 
-        <!-- Admin Quick Links -->
-        <?php if ($user_role == 'admin'): ?>
-            <div class="quick-links">
-                <a href="admin/spab.php" class="quick-link">
-                    <i class="fas fa-edit" style="font-size: 2rem; margin-bottom: 12px; display: block; color: var(--secondary);"></i>
-                    <span style="font-weight: 600; font-size: 0.95rem;">Kelola SPAB</span>
-                </a>
-                <a href="admin/destana.php" class="quick-link">
-                    <i class="fas fa-cog" style="font-size: 2rem; margin-bottom: 12px; display: block; color: var(--secondary);"></i>
-                    <span style="font-weight: 600; font-size: 0.95rem;">Kelola DESTANA</span>
-                </a>
-            </div>
-        <?php endif; ?>
+        
 
         <!-- Breakdown Cards -->
         <div class="breakdown-grid">
@@ -584,7 +564,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
         </div>
 
         <div class="footer">
-            BPBD PKRR DIY &copy; <?php echo date('Y'); ?> | Sistem Informasi Eksekutif
+             PKRR BPBD DIY &copy; <?php echo date('Y'); ?> | Sistem Informasi Eksekutif
         </div>
     </div>
 

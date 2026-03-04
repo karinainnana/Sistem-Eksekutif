@@ -42,7 +42,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?php echo $page_title; ?> - BPBD PKRR DIY</title>
+    <title><?php echo $page_title; ?> - PKRR BPBD DIY</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -466,7 +466,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4><i class="fas fa-shield-alt me-2"></i>BPBD PKRR DIY</h4>
+            <h4><i class="fas fa-shield-alt me-2"></i> PKRR BPBD DIY</h4>
             <small>Admin Panel</small>
         </div>
         <div class="sidebar-menu">
@@ -587,7 +587,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                                 <li><span>Email</span><strong><?php echo htmlspecialchars($_SESSION['email']); ?></strong></li>
                                 <li><span>Role</span><strong style="color: var(--secondary);"><?php echo ucfirst($_SESSION['role']); ?></strong></li>
                                 <li><span>Waktu Server</span><strong><?php echo date('d M Y H:i'); ?></strong></li>
-                                <li><span>Versi Sistem</span><strong>2.0.0</strong></li>
+                                <li><span>Versi Sistem</span><strong>1.0.0</strong></li>
                             </ul>
                         </div>
                     </div>

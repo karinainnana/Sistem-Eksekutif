@@ -5,7 +5,7 @@
  */
 
 // App Settings
-define('APP_NAME', 'BPBD PKRR DIY');
+define('APP_NAME', 'PKRR BPBD DIY');
 define('APP_VERSION', '1.0.0');
 define('APP_URL', 'http://localhost/project-eksekutif');
 

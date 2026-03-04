@@ -57,9 +57,7 @@ if (isset($_GET['success'])) {
         case 'logout':
             $success = 'Anda berhasil logout';
             break;
-        case 'register':
-            $success = 'Registrasi berhasil! Silakan login';
-            break;
+        
     }
 }
 ?>
@@ -79,7 +77,7 @@ if (isset($_GET['success'])) {
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #043e80 100%, #e64a19 5%);
             min-height: 100vh;
         }
         .login-card {
@@ -87,11 +85,12 @@ if (isset($_GET['success'])) {
             box-shadow: 0 25px 50px rgba(0,0,0,0.2);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
+            min-height: 620px;
         }
         .card-header {
             background: transparent !important;
             border-bottom: 1px solid rgba(0,0,0,0.1);
-            padding: 2rem;
+            padding: 3rem;
         }
         .card-header h3 {
             color: #1a1c2c;
@@ -108,7 +107,7 @@ if (isset($_GET['success'])) {
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
         }
         .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e64a19 0%);
             border: none;
             border-radius: 10px;
             padding: 12px 30px;
@@ -121,7 +120,7 @@ if (isset($_GET['success'])) {
         }
         .logo-icon {
             font-size: 3rem;
-            color: #667eea;
+            color: #e64a19;
             margin-bottom: 1rem;
         }
         .alert {
@@ -195,12 +194,7 @@ if (isset($_GET['success'])) {
                                             </span>
                                         </div>
                                         
-                                        <div class="form-check mb-4">
-                                            <input class="form-check-input" id="inputRememberPassword" type="checkbox" />
-                                            <label class="form-check-label" for="inputRememberPassword">
-                                                Ingat Saya
-                                            </label>
-                                        </div>
+                                        
                                         
                                         <div class="d-grid gap-2">
                                             <button class="btn btn-primary btn-login" type="submit" name="login">
@@ -208,18 +202,11 @@ if (isset($_GET['success'])) {
                                             </button>
                                         </div>
                                         
-                                        <div class="text-center mt-4">
-                                            <a class="small text-decoration-none" href="forgot-password.php">
-                                                Lupa Password?
-                                            </a>
-                                        </div>
+                                        
                                     </form>
                                 </div>
                                 <div class="card-footer text-center py-3 bg-light" style="border-radius: 0 0 20px 20px;">
-                                    <div class="small">
-                                        Belum punya akun? 
-                                        <a href="register.php" class="text-decoration-none fw-bold">Daftar di sini</a>
-                                    </div>
+                                   
                                 </div>
                             </div>
                         </div>

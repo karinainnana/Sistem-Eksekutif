@@ -44,7 +44,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?php echo $page_title; ?> - BPBD PKRR DIY</title>
+    <title><?php echo $page_title; ?> -  PKRR BPBD DIY</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
@@ -375,7 +375,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4><i class="fas fa-shield-alt me-2"></i>BPBD PKRR DIY</h4>
+            <h4><i class="fas fa-shield-alt me-2"></i> PKRR BPBD DIY</h4>
             <small>Admin Panel</small>
         </div>
         <div class="sidebar-menu">
@@ -503,7 +503,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                                                         <div class="col-md-6 mb-3">
                                                             <label class="form-label">Kabupaten</label>
                                                             <select name="kabupaten" class="form-select" required>
-                                                                <?php foreach (['Sleman', 'Bantul', 'Kulon Progo', 'Gunungkidul', 'Kota Yogyakarta'] as $kab): ?>
+                                                                <?php foreach (['Sleman', 'Bantul', 'Kulon Progo', 'Gunung Kidul', 'Kota Yogyakarta'] as $kab): ?>
                                                                     <option value="<?php echo $kab; ?>" <?php echo ($data['kabupaten'] == $kab) ? 'selected' : ''; ?>><?php echo $kab; ?></option>
                                                                 <?php endforeach; ?>
                                                             </select>
@@ -599,7 +599,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                                     <option value="Sleman">Sleman</option>
                                     <option value="Bantul">Bantul</option>
                                     <option value="Kulon Progo">Kulon Progo</option>
-                                    <option value="Gunungkidul">Gunungkidul</option>
+                                    <option value="Gunung Kidul">Gunung Kidul</option>
                                     <option value="Kota Yogyakarta">Kota Yogyakarta</option>
                                 </select>
                             </div>

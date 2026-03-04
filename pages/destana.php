@@ -42,7 +42,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?php echo $page_title; ?> - BPBD PKRR DIY</title>
+    <title><?php echo $page_title; ?> -  PKRR BPBD DIY</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -190,7 +190,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         .chart-card .chart-body {
             padding: 8px 10px;
             background: white;
-            height: 180px;
+            height: 280px;
         }
         
         /* Table */
@@ -433,7 +433,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
             
 
             
-            <div class="dashboard-footer">BPBD PKRR DIY &copy; <?php echo date('Y'); ?></div>
+            <div class="dashboard-footer"> PKRR BPBD DIY &copy; <?php echo date('Y'); ?></div>
         </div>
     </div>
 

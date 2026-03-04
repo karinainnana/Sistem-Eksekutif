@@ -68,7 +68,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?php echo $page_title; ?> - BPBD PKRR DIY</title>
+    <title><?php echo $page_title; ?> - PKRR BPBD DIY</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
@@ -396,7 +396,7 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4><i class="fas fa-shield-alt me-2"></i>BPBD PKRR DIY</h4>
+            <h4><i class="fas fa-shield-alt me-2"></i> PKRR BPBD DIY</h4>
             <small>Admin Panel</small>
         </div>
         <div class="sidebar-menu">
