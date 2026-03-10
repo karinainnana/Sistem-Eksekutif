@@ -1,11 +1,12 @@
 <?php
 /**
- * Admin CRUD - Evaluasi Program (SPAB & DESTANA)
+ * Eksekutif CRUD - Evaluasi Program (SPAB & DESTANA)
+ * Hanya bisa diakses oleh role 'eksekutif'
  */
 require_once dirname(__DIR__) . '/config/config.php';
 
-// Cek session admin
-if (!isset($_SESSION['log']) || $_SESSION['log'] !== true || $_SESSION['role'] !== 'admin') {
+// Cek session eksekutif
+if (!isset($_SESSION['log']) || $_SESSION['log'] !== true || $_SESSION['role'] !== 'eksekutif') {
     header('Location: ../auth/login.php');
     exit;
 }
@@ -17,7 +18,6 @@ $msg_type = '';
 // CRUD ACTIONS
 // ============================================================
 
-// CREATE
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
@@ -81,13 +81,15 @@ $r = mysqli_query($conn, "SELECT * FROM evaluasi_program ORDER BY jenis ASC, upd
 while ($row = mysqli_fetch_assoc($r)) {
     $all_evaluasi[] = $row;
 }
+
+$user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kelola Evaluasi Program - Admin PKRR BPBD DIY</title>
+    <title>Kelola Evaluasi Program - PKRR BPBD DIY</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -99,47 +101,63 @@ while ($row = mysqli_fetch_assoc($r)) {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: #f0f4f8;
+            background: linear-gradient(135deg, var(--secondary) 0%, #c43e15 100%);
             min-height: 100vh;
+            padding: 15px;
         }
+
         /* Topbar */
-        .topbar {
-            background: var(--primary);
-            color: white;
-            padding: 12px 30px;
+        .nav-header {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            align-items: center;
+            color: white;
         }
-        .topbar .brand { font-size: 1.1rem; font-weight: 700; }
-        .topbar a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; margin-left: 20px; transition: color .2s; }
-        .topbar a:hover { color: #fff; }
-        .topbar .badge-admin { background: var(--secondary); font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; margin-left: 12px; }
+        .nav-header .brand { font-size: 1.1rem; font-weight: 700; }
+        .nav-header .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .nav-header .nav-links a:hover { opacity: 1; }
+        .badge-role {
+            background: var(--primary);
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
 
         /* Content */
-        .content-wrapper { max-width: 1100px; margin: 30px auto; padding: 0 20px 40px; }
+        .content-wrapper { max-width: 1100px; margin: 0 auto; }
 
         /* Page header */
         .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #0a5299 100%);
+            background: rgba(0,0,0,0.25);
             color: white;
-            padding: 25px 30px;
+            padding: 22px 28px;
             border-radius: 14px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        .page-header h1 { font-size: 1.3rem; font-weight: 700; }
-        .page-header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+        .page-header h1 { font-size: 1.25rem; font-weight: 700; }
+        .page-header p { font-size: 0.84rem; opacity: 0.85; margin-top: 4px; }
 
         /* Card */
         .card-section {
             background: white;
             border-radius: 14px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.07);
-            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
             overflow: hidden;
         }
         .card-section .card-head {
@@ -165,13 +183,14 @@ while ($row = mysqli_fetch_assoc($r)) {
             transition: border-color .2s, box-shadow .2s;
         }
         .form-control:focus, .form-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(4,62,128,0.1);
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(230,74,25,0.12);
             outline: none;
         }
-        textarea.form-control { min-height: 130px; resize: vertical; }
+        textarea.form-control { min-height: 140px; resize: vertical; }
+
         .btn-primary-custom {
-            background: var(--primary);
+            background: var(--secondary);
             color: white;
             border: none;
             padding: 10px 24px;
@@ -181,8 +200,24 @@ while ($row = mysqli_fetch_assoc($r)) {
             cursor: pointer;
             transition: background .2s, transform .1s;
         }
-        .btn-primary-custom:hover { background: #032d5e; transform: translateY(-1px); }
+        .btn-primary-custom:hover { background: #c43e15; transform: translateY(-1px); }
+
         .btn-secondary-custom {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background .2s;
+        }
+        .btn-secondary-custom:hover { background: rgba(255,255,255,0.35); color: white; }
+
+        .btn-cancel {
             background: #6b7280;
             color: white;
             border: none;
@@ -195,7 +230,7 @@ while ($row = mysqli_fetch_assoc($r)) {
             display: inline-block;
             transition: background .2s;
         }
-        .btn-secondary-custom:hover { background: #4b5563; color: white; }
+        .btn-cancel:hover { background: #4b5563; color: white; }
 
         /* Table */
         .eval-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -213,142 +248,99 @@ while ($row = mysqli_fetch_assoc($r)) {
             border-bottom: 1px solid #f1f5f9;
             vertical-align: top;
         }
-        .eval-table tbody tr:hover { background: #f8fafc; }
+        .eval-table tbody tr:hover { background: #fef9f7; }
         .eval-table tbody tr:last-child td { border-bottom: none; }
 
         /* Badges */
         .badge-spab {
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            text-transform: uppercase;
+            background: #dbeafe; color: #1e40af;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
         }
         .badge-destana {
-            background: #fce7f3;
-            color: #9d174d;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            text-transform: uppercase;
+            background: #fce7f3; color: #9d174d;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
         }
-        .badge-latest {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.68rem;
-            font-weight: 600;
-            margin-left: 6px;
+        .badge-aktif {
+            background: #d1fae5; color: #065f46;
+            padding: 2px 8px; border-radius: 20px;
+            font-size: 0.68rem; font-weight: 600; margin-left: 6px;
         }
 
         /* Action buttons */
         .btn-edit {
-            background: #f59e0b;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            background: #f59e0b; color: white; border: none;
+            padding: 5px 12px; border-radius: 6px; font-size: 0.78rem;
+            cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 4px;
             transition: background .2s;
         }
         .btn-edit:hover { background: #d97706; color: white; }
         .btn-delete {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            background: #ef4444; color: white; border: none;
+            padding: 5px 12px; border-radius: 6px; font-size: 0.78rem;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
             transition: background .2s;
         }
         .btn-delete:hover { background: #dc2626; }
 
-        /* Isi text preview */
         .isi-preview {
-            color: #374151;
-            max-width: 450px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.6;
+            color: #374151; max-width: 430px;
+            display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden; line-height: 1.6;
         }
 
         .divider-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 8px 0 4px;
-            border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 10px;
+            font-size: 0.75rem; font-weight: 600; color: #9ca3af;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            padding: 8px 0 4px; border-bottom: 1px solid #e2e8f0; margin-bottom: 10px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #9ca3af;
-        }
-        .empty-state i { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.4; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #9ca3af; }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.4; display: block; }
 
         .alert-box {
-            border-radius: 10px;
-            padding: 12px 18px;
-            margin-bottom: 20px;
-            font-size: 0.88rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            border-radius: 10px; padding: 12px 18px; margin-bottom: 20px;
+            font-size: 0.88rem; font-weight: 500;
+            display: flex; align-items: center; gap: 8px;
         }
         .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
         .alert-danger  { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
 
-        /* Timestamp */
-        .text-muted-sm { font-size: 0.75rem; color: #9ca3af; margin-top: 3px; }
-
-        /* Info box */
         .info-box {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 10px;
-            padding: 14px 18px;
-            font-size: 0.84rem;
-            color: #1e40af;
-            margin-bottom: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 10px; padding: 13px 18px;
+            font-size: 0.84rem; color: white; margin-bottom: 18px;
         }
         .info-box i { margin-right: 6px; }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.8fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-<!-- Topbar -->
-<div class="topbar">
-    <div class="brand"><i class="fas fa-shield-alt me-2"></i>PKRR BPBD DIY <span class="badge-admin">ADMIN</span></div>
-    <div>
-        <a href="index.php"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
-        <a href="spab.php"><i class="fas fa-school me-1"></i>SPAB</a>
-        <a href="destana.php"><i class="fas fa-house-user me-1"></i>DESTANA</a>
-        <a href="../pages/spab.php" target="_blank"><i class="fas fa-eye me-1"></i>Lihat Dashboard</a>
+<!-- Navigation -->
+<div class="nav-header">
+    <div class="brand">
+        <i class="fas fa-shield-alt me-2"></i>PKRR BPBD DIY
+        <span class="badge-role">EKSEKUTIF</span>
+    </div>
+    <div class="nav-links">
+        <a href="../index.php"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+        <a href="../pages/spab.php"><i class="fas fa-school me-1"></i>SPAB</a>
+        <a href="../pages/destana.php"><i class="fas fa-house-user me-1"></i>DESTANA</a>
         <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
     </div>
 </div>
 
-<!-- Content -->
 <div class="content-wrapper">
 
     <!-- Page Header -->
@@ -357,7 +349,7 @@ while ($row = mysqli_fetch_assoc($r)) {
             <h1><i class="fas fa-file-alt me-2"></i>Kelola Evaluasi Program</h1>
             <p>Tambah, edit, dan hapus teks evaluasi yang ditampilkan di dashboard SPAB & DESTANA</p>
         </div>
-        <a href="index.php" class="btn-secondary-custom"><i class="fas fa-arrow-left me-1"></i>Kembali</a>
+        <a href="../pages/destana.php" class="btn-secondary-custom"><i class="fas fa-arrow-left me-1"></i>Kembali ke Dashboard</a>
     </div>
 
     <?php if ($msg): ?>
@@ -370,10 +362,10 @@ while ($row = mysqli_fetch_assoc($r)) {
     <!-- Info -->
     <div class="info-box">
         <i class="fas fa-info-circle"></i>
-        Teks evaluasi yang paling terbaru (berdasarkan tanggal update) akan ditampilkan secara otomatis di halaman dashboard masing-masing. Pastikan hanya ada <strong>1 evaluasi aktif per jenis</strong> untuk tampilan yang konsisten.
+        Teks evaluasi yang <strong>paling terbaru</strong> (berdasarkan tanggal update) akan ditampilkan secara otomatis di halaman dashboard masing-masing.
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 25px; align-items: start;">
+    <div class="grid-layout">
 
         <!-- FORM TAMBAH / EDIT -->
         <div class="card-section">
@@ -390,25 +382,25 @@ while ($row = mysqli_fetch_assoc($r)) {
 
                     <div class="mb-3">
                         <label class="form-label">Jenis Program <span style="color:#ef4444">*</span></label>
-                        <select name="jenis" class="form-select" required id="selectJenis">
-                            <option value="spab"    <?= (!$edit_data || $edit_data['jenis'] === 'spab')    ? 'selected' : '' ?>>SPAB (Satuan Pendidikan Aman Bencana)</option>
-                            <option value="destana" <?= ($edit_data && $edit_data['jenis'] === 'destana') ? 'selected' : '' ?>>DESTANA (Desa Tangguh Bencana)</option>
+                        <select name="jenis" class="form-select" required>
+                            <option value="spab"    <?= (!$edit_data || $edit_data['jenis'] === 'spab')    ? 'selected' : '' ?>>SPAB – Satuan Pendidikan Aman Bencana</option>
+                            <option value="destana" <?= ($edit_data && $edit_data['jenis'] === 'destana') ? 'selected' : '' ?>>DESTANA – Desa Tangguh Bencana</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Judul / Label Internal <span style="color:#ef4444">*</span></label>
+                        <label class="form-label">Judul / Label <span style="color:#ef4444">*</span></label>
                         <input type="text" name="judul" class="form-control" required
                                placeholder="Contoh: Evaluasi SPAB 2026"
                                value="<?= $edit_data ? htmlspecialchars($edit_data['judul']) : '' ?>">
-                        <small style="color:#6b7280;font-size:0.78rem;">Judul hanya untuk referensi admin, tidak ditampilkan di dashboard.</small>
+                        <small style="color:#9ca3af;font-size:0.77rem;">Judul hanya untuk referensi, tidak tampil di dashboard.</small>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Isi Teks Evaluasi <span style="color:#ef4444">*</span></label>
                         <textarea name="isi" class="form-control" required
                                   placeholder="Tulis narasi evaluasi program di sini..."><?= $edit_data ? htmlspecialchars($edit_data['isi']) : '' ?></textarea>
-                        <small style="color:#6b7280;font-size:0.78rem;">Teks ini akan ditampilkan langsung di bagian Evaluasi pada dashboard.</small>
+                        <small style="color:#9ca3af;font-size:0.77rem;">Teks ini tampil langsung di bagian Evaluasi pada dashboard.</small>
                     </div>
 
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -417,8 +409,8 @@ while ($row = mysqli_fetch_assoc($r)) {
                             <?= $edit_data ? 'Simpan Perubahan' : 'Tambah Evaluasi' ?>
                         </button>
                         <?php if ($edit_data): ?>
-                        <a href="evaluasi.php" class="btn-secondary-custom">
-                            <i class="fas fa-times me-1"></i>Batal Edit
+                        <a href="evaluasi.php" class="btn-cancel">
+                            <i class="fas fa-times me-1"></i>Batal
                         </a>
                         <?php endif; ?>
                     </div>
@@ -436,14 +428,12 @@ while ($row = mysqli_fetch_assoc($r)) {
             <div class="card-body-inner" style="padding: 0;">
                 <?php if (empty($all_evaluasi)): ?>
                 <div class="empty-state">
-                    <div><i class="fas fa-file-alt"></i></div>
+                    <i class="fas fa-file-alt"></i>
                     <p>Belum ada data evaluasi.</p>
                     <small>Tambahkan evaluasi menggunakan form di samping.</small>
                 </div>
                 <?php else: ?>
-
                 <?php
-                // Pisah per jenis & tandai yang terbaru
                 $spab_rows    = array_filter($all_evaluasi, fn($r) => $r['jenis'] === 'spab');
                 $destana_rows = array_filter($all_evaluasi, fn($r) => $r['jenis'] === 'destana');
                 $first_spab    = !empty($spab_rows)    ? array_key_first($spab_rows)    : null;
@@ -452,11 +442,11 @@ while ($row = mysqli_fetch_assoc($r)) {
                 <table class="eval-table">
                     <thead>
                         <tr>
-                            <th style="width:90px">Jenis</th>
+                            <th style="width:100px">Jenis</th>
                             <th>Judul</th>
                             <th>Isi (Ringkasan)</th>
-                            <th style="width:100px">Diperbarui</th>
-                            <th style="width:100px;text-align:center">Aksi</th>
+                            <th style="width:95px">Diperbarui</th>
+                            <th style="width:90px;text-align:center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -465,10 +455,10 @@ while ($row = mysqli_fetch_assoc($r)) {
                             <td>
                                 <span class="badge-<?= $row['jenis'] ?>"><?= strtoupper($row['jenis']) ?></span>
                                 <?php
-                                $is_latest = ($row['jenis'] === 'spab' && $idx === $first_spab) ||
-                                             ($row['jenis'] === 'destana' && $idx === $first_destana);
-                                if ($is_latest): ?>
-                                <span class="badge-latest">Aktif</span>
+                                $is_aktif = ($row['jenis'] === 'spab'    && $idx === $first_spab) ||
+                                            ($row['jenis'] === 'destana' && $idx === $first_destana);
+                                if ($is_aktif): ?>
+                                <span class="badge-aktif">Aktif</span>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -480,7 +470,7 @@ while ($row = mysqli_fetch_assoc($r)) {
                             <td>
                                 <div style="font-size:0.78rem;color:#6b7280;">
                                     <?= date('d/m/Y', strtotime($row['updated_at'])) ?><br>
-                                    <?= date('H:i', strtotime($row['updated_at'])) ?>
+                                    <span style="font-size:0.72rem;"><?= date('H:i', strtotime($row['updated_at'])) ?></span>
                                 </div>
                             </td>
                             <td style="text-align:center;">
@@ -489,7 +479,7 @@ while ($row = mysqli_fetch_assoc($r)) {
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form method="POST" action="evaluasi.php" style="display:inline;"
-                                          onsubmit="return confirm('Yakin hapus evaluasi ini?')">
+                                          onsubmit="return confirm('Yakin ingin menghapus evaluasi ini?')">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?= $row['id'] ?>">
                                         <button type="submit" class="btn-delete" title="Hapus">
@@ -524,7 +514,7 @@ while ($row = mysqli_fetch_assoc($r)) {
                 <?php if ($preview_spab): ?>
                 <div>
                     <div class="divider-label"><i class="fas fa-school me-1"></i>SPAB — Aktif</div>
-                    <div style="background:#f8fafc;border-radius:10px;padding:15px;font-size:0.88rem;line-height:1.7;color:#374151;border-left:3px solid #043e80;">
+                    <div style="background:#f8fafc;border-radius:10px;padding:15px;font-size:0.88rem;line-height:1.7;color:#374151;border-left:3px solid #e64a19;">
                         <?= nl2br(htmlspecialchars($preview_spab['isi'])) ?>
                     </div>
                 </div>
@@ -532,7 +522,7 @@ while ($row = mysqli_fetch_assoc($r)) {
                 <?php if ($preview_destana): ?>
                 <div>
                     <div class="divider-label"><i class="fas fa-house-user me-1"></i>DESTANA — Aktif</div>
-                    <div style="background:#f8fafc;border-radius:10px;padding:15px;font-size:0.88rem;line-height:1.7;color:#374151;border-left:3px solid #e64a19;">
+                    <div style="background:#f8fafc;border-radius:10px;padding:15px;font-size:0.88rem;line-height:1.7;color:#374151;border-left:3px solid #043e80;">
                         <?= nl2br(htmlspecialchars($preview_destana['isi'])) ?>
                     </div>
                 </div>

@@ -447,8 +447,8 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
             <div class="chart-card">
                 <div class="chart-header" style="background-color:#e64a19; color:white; display:flex; justify-content:space-between; align-items:center;">
                     <span><i class="fas fa-info-circle me-2"></i>EVALUASI PROGRAM SPAB</span>
-                    <?php if ($user_role === 'admin'): ?>
-                    <a href="../admin/evaluasi.php" style="font-size:0.78rem;background:rgba(255,255,255,0.2);color:white;padding:4px 12px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                    <?php if ($user_role === 'eksekutif'): ?>
+                    <a href="../eksekutif/evaluasi.php" style="font-size:0.78rem;background:rgba(255,255,255,0.2);color:white;padding:4px 12px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
                         <i class="fas fa-edit"></i> Edit Evaluasi
                     </a>
                     <?php endif; ?>
@@ -460,8 +460,8 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                     <?php else: ?>
                     <p style="color:#9ca3af;font-style:italic;">
                         Belum ada teks evaluasi. 
-                        <?php if ($user_role === 'admin'): ?>
-                        <a href="../admin/evaluasi.php" style="color:#e64a19;">Tambahkan di panel admin &rarr;</a>
+                        <?php if ($user_role === 'eksekutif'): ?>
+                        <a href="../eksekutif/evaluasi.php" style="color:#e64a19;">Tambahkan di sini &rarr;</a>
                         <?php endif; ?>
                     </p>
                     <?php endif; ?>
