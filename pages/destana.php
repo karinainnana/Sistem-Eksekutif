@@ -35,6 +35,9 @@ $tahunList = getDestanaTahunList();
 // Get all DESTANA data
 $allDestana = getAllDESTANA($filters, 'ASC');
 
+// Get evaluasi teks dari DB
+$evaluasi = getEvaluasiDESTANA();
+
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 ?>
 <!DOCTYPE html>
@@ -434,20 +437,26 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 
             <!-- Evaluasi DESTANA -->
             <div class="chart-card">
-                <div class="chart-header" style="color:white;">
-                    <i class="fas fa-info-circle me-2"></i>EVALUASI PROGRAM DESTANA
+                <div class="chart-header" style="color:white; display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fas fa-info-circle me-2"></i>EVALUASI PROGRAM DESTANA</span>
+                    <?php if ($user_role === 'admin'): ?>
+                    <a href="../admin/evaluasi.php" style="font-size:0.78rem;background:rgba(255,255,255,0.2);color:white;padding:4px 12px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        <i class="fas fa-edit"></i> Edit Evaluasi
+                    </a>
+                    <?php endif; ?>
                 </div>
 
                 <div class="chart-body" style="height:auto; padding:15px; font-size:0.9rem; line-height:1.7;">
-                    
-                    <p>
-                    Berdasarkan data pada dashboard, jumlah Desa Tangguh Bencana (DESTANA) 
-                    di Daerah Istimewa Yogyakarta telah mencapai 
-                    <strong><?php echo number_format($total_destana); ?> desa</strong>.
-                    Hal ini menunjukkan bahwa implementasi program DESTANA telah menjangkau seluruh desa yang ada di wilayah DIY.
-                    Namun mayoritas DESTANA masih berada pada tingkat 'Tangguh Pratama', 
-                    yang menunjukkan bahwa <strong>masih banyak desa yang perlu ditingkatkan kapasitasnya untuk mencapai tingkat yang lebih tinggi yaitu Madya dan Utama. </strong>
+                    <?php if ($evaluasi && !empty($evaluasi['isi'])): ?>
+                    <p><?= nl2br(htmlspecialchars($evaluasi['isi'])) ?></p>
+                    <?php else: ?>
+                    <p style="color:#9ca3af;font-style:italic;">
+                        Belum ada teks evaluasi. 
+                        <?php if ($user_role === 'admin'): ?>
+                        <a href="../admin/evaluasi.php" style="color:#043e80;">Tambahkan di panel admin &rarr;</a>
+                        <?php endif; ?>
                     </p>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="dashboard-footer"> PKRR BPBD DIY &copy; <?php echo date('Y'); ?></div>

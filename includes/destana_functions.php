@@ -265,4 +265,33 @@ function getDestanaTahunList() {
     }
     return $data;
 }
+
+// ============================================================
+// EVALUASI PROGRAM FUNCTIONS
+// ============================================================
+
+/**
+ * Get active evaluasi DESTANA (latest/active record)
+ */
+function getEvaluasiDESTANA() {
+    global $conn;
+    $result = mysqli_query($conn, "SELECT * FROM evaluasi_program WHERE jenis = 'destana' ORDER BY id DESC LIMIT 1");
+    if ($result && mysqli_num_rows($result) > 0) {
+        return mysqli_fetch_assoc($result);
+    }
+    return null;
+}
+
+/**
+ * Get all evaluasi DESTANA records
+ */
+function getAllEvaluasiDESTANA() {
+    global $conn;
+    $data = [];
+    $result = mysqli_query($conn, "SELECT * FROM evaluasi_program WHERE jenis = 'destana' ORDER BY updated_at DESC");
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = $row;
+    }
+    return $data;
+}
 ?>

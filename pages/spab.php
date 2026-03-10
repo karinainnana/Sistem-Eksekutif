@@ -37,6 +37,9 @@ $tahunList = getTahunList();
 // Get all SPAB data
 $allSpab = getAllSPAB($filters, 'ASC');
 
+// Get evaluasi teks dari DB
+$evaluasi = getEvaluasiSPAB();
+
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 ?>
 <!DOCTYPE html>
@@ -440,21 +443,28 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                 </div>
             </div>
             
-            <!-- Evaluasi DESTANA -->
+            <!-- Evaluasi SPAB -->
             <div class="chart-card">
-                <div class="chart-header" style="background-color:#e64a19; color:white;">
-                    <i class="fas fa-info-circle me-2"></i>EVALUASI PROGRAM SPAB
+                <div class="chart-header" style="background-color:#e64a19; color:white; display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fas fa-info-circle me-2"></i>EVALUASI PROGRAM SPAB</span>
+                    <?php if ($user_role === 'admin'): ?>
+                    <a href="../admin/evaluasi.php" style="font-size:0.78rem;background:rgba(255,255,255,0.2);color:white;padding:4px 12px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        <i class="fas fa-edit"></i> Edit Evaluasi
+                    </a>
+                    <?php endif; ?>
                 </div>
 
                 <div class="chart-body" style="height:auto; padding:15px; font-size:0.9rem; line-height:1.7;">
-                    
-                    <p>
-                    Berdasarkan data pada dashboard, jumlah Satuan Pendidikan Aman Bencana (SPAB) 
-                    di Daerah Istimewa Yogyakarta telah mencapai 
-                    <strong><?php echo number_format($total_spab); ?> sekolah</strong> dari total sekitar 8.8322 sekolah di DIY.
-                    Hal ini menunjukkan bahwa implementasi program SPAB belum menjangkau seluruh sekolah yang ada di wilayah DIY.
-                    Yang menunjukkan bahwa <strong>masih banyak sekolah yang perlu ditingkatkan agar seluruh satuan pendidikan memiliki kesiapsiagaan terhadap bencana. </strong>
+                    <?php if ($evaluasi && !empty($evaluasi['isi'])): ?>
+                    <p><?= nl2br(htmlspecialchars($evaluasi['isi'])) ?></p>
+                    <?php else: ?>
+                    <p style="color:#9ca3af;font-style:italic;">
+                        Belum ada teks evaluasi. 
+                        <?php if ($user_role === 'admin'): ?>
+                        <a href="../admin/evaluasi.php" style="color:#e64a19;">Tambahkan di panel admin &rarr;</a>
+                        <?php endif; ?>
                     </p>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="dashboard-footer"> PKRR BPBD DIY &copy; <?php echo date('Y'); ?></div>
