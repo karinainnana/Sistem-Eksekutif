@@ -337,6 +337,9 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
             <a href="../index.php">Dashboard</a>
             <a href="spab.php" class="active">SPAB</a>
             <a href="destana.php">DESTANA</a>
+            <?php if ($user_role === 'eksekutif'): ?>
+            <a href="../eksekutif/evaluasi.php"><i class="fas fa-file-alt me-1"></i>Kelola Evaluasi</a>
+            <?php endif; ?>
             <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
         </div>
     </div>
