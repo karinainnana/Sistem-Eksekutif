@@ -190,7 +190,7 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
         .chart-card .chart-body {
             padding: 8px 10px;
             background: white;
-            height: 280px;
+            height: 260px;
         }
         
         /* Table */
@@ -432,7 +432,24 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
             </div>
             
 
-            
+            <!-- Evaluasi DESTANA -->
+            <div class="chart-card">
+                <div class="chart-header" style="color:white;">
+                    <i class="fas fa-info-circle me-2"></i>EVALUASI PROGRAM DESTANA
+                </div>
+
+                <div class="chart-body" style="height:auto; padding:15px; font-size:0.9rem; line-height:1.7;">
+                    
+                    <p>
+                    Berdasarkan data pada dashboard, jumlah Desa Tangguh Bencana (DESTANA) 
+                    di Daerah Istimewa Yogyakarta telah mencapai 
+                    <strong><?php echo number_format($total_destana); ?> desa</strong>.
+                    Hal ini menunjukkan bahwa implementasi program DESTANA telah menjangkau seluruh desa yang ada di wilayah DIY.
+                    Namun mayoritas DESTANA masih berada pada tingkat 'Tangguh Pratama', 
+                    yang menunjukkan bahwa <strong>masih banyak desa yang perlu ditingkatkan kapasitasnya untuk mencapai tingkat yang lebih tinggi yaitu Madya dan Utama. </strong>
+                    </p>
+                </div>
+            </div>
             <div class="dashboard-footer"> PKRR BPBD DIY &copy; <?php echo date('Y'); ?></div>
         </div>
     </div>

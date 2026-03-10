@@ -95,7 +95,7 @@ if (isset($_POST['updatedestana'])) {
     $indeks = $_POST['indeks'];
     $tingkat = $_POST['tingkat'];
 
-    mysqli_query($conn, "UPDATE destanaa SET 
+    mysqli_query($conn, "UPDATE destana SET 
         desa='$desa',
         kecamatan='$kecamatan',
         kabupaten='$kabupaten',
@@ -111,7 +111,7 @@ if (isset($_POST['updatedestana'])) {
 if (isset($_POST['hapusdestana'])) {
     $id = $_POST['id_destana'];
 
-    mysqli_query($conn, "DELETE FROM destanaa WHERE id_destana='$id'");
+    mysqli_query($conn, "DELETE FROM destana WHERE id_destana='$id'");
 
     header("location: keluar.php");
 }

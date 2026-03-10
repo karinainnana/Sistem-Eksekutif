@@ -440,8 +440,23 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
                 </div>
             </div>
             
+            <!-- Evaluasi DESTANA -->
+            <div class="chart-card">
+                <div class="chart-header" style="background-color:#e64a19; color:white;">
+                    <i class="fas fa-info-circle me-2"></i>EVALUASI PROGRAM SPAB
+                </div>
 
-            
+                <div class="chart-body" style="height:auto; padding:15px; font-size:0.9rem; line-height:1.7;">
+                    
+                    <p>
+                    Berdasarkan data pada dashboard, jumlah Satuan Pendidikan Aman Bencana (SPAB) 
+                    di Daerah Istimewa Yogyakarta telah mencapai 
+                    <strong><?php echo number_format($total_spab); ?> sekolah</strong> dari total sekitar 8.8322 sekolah di DIY.
+                    Hal ini menunjukkan bahwa implementasi program SPAB belum menjangkau seluruh sekolah yang ada di wilayah DIY.
+                    Yang menunjukkan bahwa <strong>masih banyak sekolah yang perlu ditingkatkan agar seluruh satuan pendidikan memiliki kesiapsiagaan terhadap bencana. </strong>
+                    </p>
+                </div>
+            </div>
             <div class="dashboard-footer"> PKRR BPBD DIY &copy; <?php echo date('Y'); ?></div>
         </div>
     </div>
