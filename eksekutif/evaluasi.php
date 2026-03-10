@@ -12,11 +12,17 @@ if (!isset($_SESSION['log']) || $_SESSION['log'] !== true || $_SESSION['role'] !
     exit;
 }
 
+// Flash message dari session (setelah redirect)
 $msg = '';
 $msg_type = '';
+if (isset($_SESSION['flash_msg'])) {
+    $msg = $_SESSION['flash_msg'];
+    $msg_type = $_SESSION['flash_type'];
+    unset($_SESSION['flash_msg'], $_SESSION['flash_type']);
+}
 
 // ============================================================
-// CRUD ACTIONS
+// CRUD ACTIONS (Post-Redirect-Get pattern)
 // ============================================================
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -31,12 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $q = "INSERT INTO evaluasi_program (jenis, judul, isi, created_at, updated_at)
               VALUES ('$jenis', '$judul', '$isi', '$now', '$now')";
         if (mysqli_query($conn, $q)) {
-            $msg = 'Evaluasi berhasil ditambahkan.';
-            $msg_type = 'success';
+            $_SESSION['flash_msg'] = 'Evaluasi berhasil ditambahkan.';
+            $_SESSION['flash_type'] = 'success';
         } else {
-            $msg = 'Gagal menambahkan evaluasi: ' . mysqli_error($conn);
-            $msg_type = 'danger';
+            $_SESSION['flash_msg'] = 'Gagal menambahkan evaluasi: ' . mysqli_error($conn);
+            $_SESSION['flash_type'] = 'danger';
         }
+        header('Location: evaluasi.php');
+        exit;
 
     } elseif ($action === 'update') {
         $id     = (int)$_POST['id'];
@@ -48,23 +56,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $q = "UPDATE evaluasi_program SET jenis='$jenis', judul='$judul', isi='$isi', updated_at='$now'
               WHERE id = $id";
         if (mysqli_query($conn, $q)) {
-            $msg = 'Evaluasi berhasil diperbarui.';
-            $msg_type = 'success';
+            $_SESSION['flash_msg'] = 'Evaluasi berhasil diperbarui.';
+            $_SESSION['flash_type'] = 'success';
         } else {
-            $msg = 'Gagal memperbarui evaluasi: ' . mysqli_error($conn);
-            $msg_type = 'danger';
+            $_SESSION['flash_msg'] = 'Gagal memperbarui evaluasi: ' . mysqli_error($conn);
+            $_SESSION['flash_type'] = 'danger';
         }
+        header('Location: evaluasi.php');
+        exit;
 
     } elseif ($action === 'delete') {
         $id = (int)$_POST['id'];
         $q  = "DELETE FROM evaluasi_program WHERE id = $id";
         if (mysqli_query($conn, $q)) {
-            $msg = 'Evaluasi berhasil dihapus.';
-            $msg_type = 'success';
+            $_SESSION['flash_msg'] = 'Evaluasi berhasil dihapus.';
+            $_SESSION['flash_type'] = 'success';
         } else {
-            $msg = 'Gagal menghapus evaluasi: ' . mysqli_error($conn);
-            $msg_type = 'danger';
+            $_SESSION['flash_msg'] = 'Gagal menghapus evaluasi: ' . mysqli_error($conn);
+            $_SESSION['flash_type'] = 'danger';
         }
+        header('Location: evaluasi.php');
+        exit;
     }
 }
 
