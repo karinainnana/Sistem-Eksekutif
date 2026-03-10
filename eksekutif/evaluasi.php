@@ -1,11 +1,12 @@
 <?php
 /**
  * Eksekutif CRUD - Evaluasi Program (SPAB & DESTANA)
- * Hanya bisa diakses oleh role 'eksekutif'
+ * Hanya bisa diakses oleh pimpinan (role 'eksekutif')
+ * Admin tidak diizinkan mengakses halaman ini
  */
 require_once dirname(__DIR__) . '/config/config.php';
 
-// Cek session eksekutif
+// Cek session - hanya role eksekutif (pimpinan) yang boleh akses
 if (!isset($_SESSION['log']) || $_SESSION['log'] !== true || $_SESSION['role'] !== 'eksekutif') {
     header('Location: ../auth/login.php');
     exit;
@@ -78,8 +79,10 @@ if (isset($_GET['edit'])) {
 // Fetch all data
 $all_evaluasi = [];
 $r = mysqli_query($conn, "SELECT * FROM evaluasi_program ORDER BY jenis ASC, updated_at DESC");
-while ($row = mysqli_fetch_assoc($r)) {
-    $all_evaluasi[] = $row;
+if ($r) {
+    while ($row = mysqli_fetch_assoc($r)) {
+        $all_evaluasi[] = $row;
+    }
 }
 
 $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';

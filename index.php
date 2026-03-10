@@ -488,7 +488,9 @@ $user_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
                 <a href="index.php" class="active">Dashboard</a>
                 <a href="pages/spab.php">SPAB</a>
                 <a href="pages/destana.php">DESTANA</a>
-                
+                <?php if ($user_role === 'eksekutif'): ?>
+                <a href="eksekutif/evaluasi.php"><i class="fas fa-file-alt me-1"></i>Kelola Evaluasi</a>
+                <?php endif; ?>
                 <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
             </div>
         </div>
